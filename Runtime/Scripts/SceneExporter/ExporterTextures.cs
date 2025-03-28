@@ -325,7 +325,8 @@ namespace UnityGLTF
 			}
 			
 			// Avoid overwriting existing files
-			imagePath = GetUniqueName(_imageExportPaths, imagePath);
+			if (!settings.OverwriteTextureSameName)
+				imagePath = GetUniqueName(_imageExportPaths, imagePath);
 			_imageExportPaths.Add(imagePath);
 
 			return imagePath;

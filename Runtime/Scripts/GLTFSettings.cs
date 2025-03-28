@@ -120,6 +120,8 @@ namespace UnityGLTF
 		private bool useTextureFileTypeHeuristic = true;
 		[SerializeField] [Tooltip("Quality setting for exported JPEG files.")]
 		private int defaultJpegQuality = 90;
+        [SerializeField]
+        private bool overwriteTextureSameName = false;
 
 		[Header("Export Animation")]
 		[SerializeField]
@@ -160,6 +162,7 @@ namespace UnityGLTF
 		public bool ExportDisabledGameObjects { get => exportDisabledGameObjects; set => exportDisabledGameObjects = value; }
 		public bool ExportAnimations { get => exportAnimations; set => exportAnimations = value; }
 		public bool BakeAnimationSpeed { get => bakeAnimationSpeed; set => bakeAnimationSpeed = value; }
+		public bool OverwriteTextureSameName { get => overwriteTextureSameName; set => overwriteTextureSameName = value; }
 
 		[Obsolete("Add/remove \"AnimationPointerPlugin\" from ExportPlugins instead.")]
 		public bool UseAnimationPointer

@@ -23,8 +23,6 @@ namespace UnityGLTF.Plugins
 			RenderTexture.active = null;
 		}
 
-		const float LOG_1000 = 3f;
-
 		public override bool BeforeMaterialExport(GLTFSceneExporter exporter, GLTFRoot gltfRoot, Material material, GLTFMaterial materialNode)
         {
             if (material.shader.name.Contains("p0/Reflective/Bumped Specular SMap"))
@@ -61,7 +59,7 @@ namespace UnityGLTF.Plugins
 
                 Color colorSpec = material.GetColor("_SpecColor");
                 float floatSpec = material.GetFloat("_Glossness");
-				floatSpec = Mathf.Log10(floatSpec * 100f) / LOG_1000;
+				floatSpec = Mathf.Clamp01(floatSpec);
                 floatSpec *= material.GetVector("_SpecVals").x;
                 specularFactor.X = colorSpec.r * floatSpec;
 				specularFactor.Y = colorSpec.g * floatSpec;
@@ -69,7 +67,7 @@ namespace UnityGLTF.Plugins
 
 
 				float floatGlos = material.GetFloat("_Specularness");
-                glossinessFactor = (Mathf.Log10(floatGlos * 100f) / LOG_1000);
+                glossinessFactor = Mathf.Clamp01(floatGlos);
 
 
                 exporter.DeclareExtensionUsage(KHR_materials_pbrSpecularGlossinessExtensionFactory.EXTENSION_NAME, true);

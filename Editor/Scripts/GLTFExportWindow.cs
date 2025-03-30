@@ -44,21 +44,27 @@ namespace UnityGLTF
 
         void PreprocessLODs()
         {
-            foreach (var lodGroup in FindObjectsOfType<LODGroup>())
-            {
-                Undo.RecordObject(lodGroup, $"{lodGroup} - force LOD0");
-                lodGroup.ForceLOD(0);
+            Dictionary<GameObject, bool> origActiveState = new Dictionary<GameObject, bool>();
 
+            LODGroup[] lodGroups = FindObjectsOfType<LODGroup>();
+
+            foreach (var lodGroup in lodGroups)
+            {
                 for (int i = 0; i < lodGroup.GetLODs().Length; i++)
                 {
                     foreach (var rend in lodGroup.GetLODs()[i].renderers)
                     {
                         if (rend == null) continue;
 
-                        bool toExport = i == 0 && rend.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+                        bool shadow = rend.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
 
-                        if (toExport) // only disable
-                            continue;
+                        bool toExport = i == 0 && !shadow;
+
+                        if (toExport)
+                            continue; // only disable
+
+                        if (i > 0 && lodGroup.GetLODs()[0].renderers.Contains(rend))
+                            continue; // don't disable if the mesh is also in LOD0
 
                         if (rend.gameObject.activeSelf != toExport)
                             Undo.RecordObject(rend.gameObject, $"{rend.gameObject} - SetActive to {toExport}");
@@ -66,6 +72,9 @@ namespace UnityGLTF
                         rend.gameObject.SetActive(toExport);
                     }
                 }
+
+                Undo.RecordObject(lodGroup, $"{lodGroup} - disable");
+                lodGroup.enabled = false;
             }
         }
 
@@ -74,8 +83,11 @@ namespace UnityGLTF
             settings.ExportDisabledGameObjects = false;
             settings.UseTextureFileTypeHeuristic = false;
             settings.RequireExtensions = true;
-            settings.ExportPlugins = new List<GLTFExportPlugin>();
-            settings.ExportPlugins.Add(ScriptableObject.CreateInstance(typeof(TarkovMaterialExport)) as TarkovMaterialExport);
+            settings.ExportPlugins = new List<GLTFExportPlugin>
+            {
+                ScriptableObject.CreateInstance(typeof(TarkovMaterialExport)) as TarkovMaterialExport,
+                ScriptableObject.CreateInstance(typeof(LightsPunctualExport)) as LightsPunctualExport
+            };
 
             GLTFSceneExporter exporter = new GLTFSceneExporter(GetAllRootTransforms(), new ExportContext(settings));
 

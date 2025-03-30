@@ -19,6 +19,7 @@ namespace UnityGLTF.Plugins
 	{
 		public override void AfterNodeExport(GLTFSceneExporter exporter, GLTFRoot gltfroot, Transform transform, Node node)
 		{
+			return;
 			if (!transform) return;
 
 			var lodGroup = transform.GetComponent<LODGroup>();

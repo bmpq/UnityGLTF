@@ -1,54 +1,44 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityGLTF;
+using UnityGLTF.Plugins;
 
 namespace UnityGLTF
 {
     public class GLTFExportWindow : EditorWindow
     {
+        GLTFSettings gltfSettings;
+
         [MenuItem("Window/GLTF Scene Exporter")]
         public static void ShowWindow()
         {
             GetWindow<GLTFExportWindow>("GLTF Scene Exporter");
         }
 
+        private void OnEnable()
+        {
+            gltfSettings = GLTFSettings.GetOrCreateSettings();
+        }
+
         void OnGUI()
         {
-            var settings = GLTFSettings.GetOrCreateSettings();
+            gltfSettings.SaveFolderPath = EditorGUILayout.TextField("Export path", "T:/export/gltfscenes");
 
-            settings.SaveFolderPath = EditorGUILayout.TextField("Export path", "T:/export/gltfscenes");
-
-            settings.OverwriteTextureSameName = GUILayout.Toggle(true, "Overwrite textures with the same name");
+            gltfSettings.OverwriteTextureSameName = GUILayout.Toggle(gltfSettings.OverwriteTextureSameName, "Overwrite textures with the same name");
 
             if (GUILayout.Button($"Preprocess all LODs"))
             {
                 PreprocessLODs();
             }
 
-            if (GUILayout.Button($"Preprocess all Materials"))
-            {
-                PreprocessMaterials();
-            }
-
             if (GUILayout.Button($"Preprocess & Export All"))
             {
                 PreprocessLODs();
-                PreprocessMaterials();
-                ExportScenes(settings);
-            }
-        }
-
-        void PreprocessMaterials()
-        {
-            foreach (var rend in FindObjectsOfType<Renderer>())
-            {
-                if (!rend.enabled || !rend.gameObject.activeSelf)
-                    continue;
-
-                throw new System.NotImplementedException();
+                ExportScenes(gltfSettings);
             }
         }
 
@@ -56,6 +46,9 @@ namespace UnityGLTF
         {
             foreach (var lodGroup in FindObjectsOfType<LODGroup>())
             {
+                Undo.RecordObject(lodGroup, $"{lodGroup} - force LOD0");
+                lodGroup.ForceLOD(0);
+
                 for (int i = 0; i < lodGroup.GetLODs().Length; i++)
                 {
                     foreach (var rend in lodGroup.GetLODs()[i].renderers)
@@ -63,6 +56,9 @@ namespace UnityGLTF
                         if (rend == null) continue;
 
                         bool toExport = i == 0 && rend.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+
+                        if (toExport) // only disable
+                            continue;
 
                         if (rend.gameObject.activeSelf != toExport)
                             Undo.RecordObject(rend.gameObject, $"{rend.gameObject} - SetActive to {toExport}");
@@ -75,6 +71,12 @@ namespace UnityGLTF
 
         void ExportScenes(GLTFSettings settings)
         {
+            settings.ExportDisabledGameObjects = false;
+            settings.UseTextureFileTypeHeuristic = false;
+            settings.RequireExtensions = true;
+            settings.ExportPlugins = new List<GLTFExportPlugin>();
+            settings.ExportPlugins.Add(ScriptableObject.CreateInstance(typeof(TarkovMaterialExport)) as TarkovMaterialExport);
+
             GLTFSceneExporter exporter = new GLTFSceneExporter(GetAllRootTransforms(), new ExportContext(settings));
 
             string sceneName = "scene";

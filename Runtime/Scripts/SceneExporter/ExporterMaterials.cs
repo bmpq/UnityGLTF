@@ -410,7 +410,7 @@ namespace UnityGLTF
         }
 #endif
 
-		private void ExportTextureTransform(TextureInfo def, Material mat, string texName)
+		public void ExportTextureTransform(TextureInfo def, Material mat, string texName)
 		{
 			if (def == null) return;
 

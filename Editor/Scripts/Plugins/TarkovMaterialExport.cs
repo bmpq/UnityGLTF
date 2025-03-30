@@ -181,6 +181,49 @@ namespace UnityGLTF.Plugins
 
                 return true;
             }
+            else if (material.shader.name == "Cloth/ClothShader")
+            {
+                var pbr = new PbrMetallicRoughness();
+
+                pbr.BaseColorFactor = material.GetColor("_Color").ToNumericsColorLinear();
+
+                Material setAlpha = new Material(Shader.Find("Hidden/SetAlphaFromTexture"));
+                if (material.HasTexture("_CutoutMask"))
+                    setAlpha.SetTexture("_AlphaTex", material.GetTexture("_CutoutMask"));
+                else
+                    setAlpha.SetTexture("_AlphaTex", Texture2D.whiteTexture);
+                Texture mainTex = TextureConverter.Convert(material.GetTexture("_MainTex"), setAlpha);
+                pbr.BaseColorTexture = exporter.ExportTextureInfo(mainTex, TextureMapType.BaseColor);
+                exporter.ExportTextureTransform(pbr.BaseColorTexture, material, "_MainTex");
+                materialNode.AlphaMode = AlphaMode.MASK;
+
+                Material channelMixer = new Material(Shader.Find("Hidden/ChannelMixer"));
+                Texture2D texRoughness = TextureConverter.Invert(material.GetTexture("_GlossMap"));
+                channelMixer.SetTexture("_TexFirst", texRoughness);
+                channelMixer.SetTexture("_TexSecond", Texture2D.whiteTexture);
+                channelMixer.SetFloat("_SourceR", (int)ChannelSource.TexSecond_Red);
+                channelMixer.SetFloat("_SourceG", (int)ChannelSource.TexFirst_Red);
+                channelMixer.SetFloat("_SourceB", (int)ChannelSource.TexSecond_Red);
+                channelMixer.SetFloat("_SourceA", (int)ChannelSource.TexSecond_Red);
+                Texture2D texMetallicRoughness = TextureConverter.Convert(material.GetTexture("_GlossMap"), channelMixer, "MR");
+
+                pbr.MetallicRoughnessTexture = exporter.ExportTextureInfo(texMetallicRoughness, TextureMapType.Linear);
+                exporter.ExportTextureTransform(pbr.MetallicRoughnessTexture, material, "_GlossMap");
+
+                pbr.RoughnessFactor = 1f - material.GetFloat("_Glossiness");
+                pbr.MetallicFactor = (material.GetFloat("_Metallic") + 1f) / 2f;
+
+                var normalTex = material.GetTexture("_NormalMap1");
+                if (normalTex && normalTex is Texture2D)
+                {
+                    materialNode.NormalTexture = exporter.ExportNormalTextureInfo(normalTex, TextureMapType.Normal, material);
+                    exporter.ExportTextureTransform(materialNode.NormalTexture, material, "_NormalMap1");
+                }
+
+                materialNode.PbrMetallicRoughness = pbr;
+
+                return true;
+            }
 
             return false;
 		}

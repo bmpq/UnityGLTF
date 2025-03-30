@@ -7,9 +7,21 @@ using UnityEngine;
 
 namespace UnityGLTF
 {
+    public enum ChannelSource
+    {
+        TexFirst_Red = 0,
+        TexFirst_Green = 1,
+        TexFirst_Blue = 2,
+        TexFirst_Alpha = 3,
+        TexSecond_Red = 4,
+        TexSecond_Green = 5,
+        TexSecond_Blue = 6,
+        TexSecond_Alpha = 7
+    }
+
     public static class TextureConverter
     {
-        public static Texture2D Convert(Texture inputTexture, Material mat)
+        public static Texture2D Convert(Texture inputTexture, Material mat, string replaceTag = null)
         {
             bool sRGBWrite = GL.sRGBWrite;
             GL.sRGBWrite = false;
@@ -22,7 +34,10 @@ namespace UnityGLTF
             RenderTexture.ReleaseTemporary(temporary);
             GL.sRGBWrite = sRGBWrite;
 
-            convertedTexture.name = inputTexture.name;
+            if (!string.IsNullOrEmpty(replaceTag))
+                convertedTexture.name = ReplaceLastWord(inputTexture.name, '_', replaceTag);
+            else 
+                convertedTexture.name = inputTexture.name;
 
             return convertedTexture;
         }
@@ -41,6 +56,26 @@ namespace UnityGLTF
 
             Texture2D convertedTexture = temporary.ToTexture2D();
             convertedTexture.name = ReplaceLastWord(inputTextureAlbedoSpec.name, '_', "SPECGLOS");
+
+            RenderTexture.ReleaseTemporary(temporary);
+            GL.sRGBWrite = sRGBWrite;
+
+            return convertedTexture;
+        }
+
+        public static Texture2D Invert(Texture inputTexture)
+        {
+            Material mat = new Material(Shader.Find("Hidden/Invert"));
+            mat.SetTexture("_MainTex", inputTexture);
+
+            bool sRGBWrite = GL.sRGBWrite;
+            GL.sRGBWrite = false;
+            RenderTexture temporary = RenderTexture.GetTemporary(inputTexture.width, inputTexture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+
+            Graphics.Blit(inputTexture, temporary, mat);
+
+            Texture2D convertedTexture = temporary.ToTexture2D();
+            convertedTexture.name = ReplaceLastWord(inputTexture.name, '_', "INVERTED");
 
             RenderTexture.ReleaseTemporary(temporary);
             GL.sRGBWrite = sRGBWrite;

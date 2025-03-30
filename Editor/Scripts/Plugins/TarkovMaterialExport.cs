@@ -88,15 +88,101 @@ namespace UnityGLTF.Plugins
                     materialNode.NormalTexture = exporter.ExportNormalTextureInfo(normalTex, TextureMapType.Normal, material);
                     exporter.ExportTextureTransform(materialNode.NormalTexture, material, "_BumpMap");
                 }
-                else
-                {
-                    Debug.LogWarning($"{material} has an invalid normal map");
-                }
 
                 return true;
 			}
+            else if (material.shader.name == "p0/Reflective/Bumped Specular")
+            {
+                GLTF.Math.Color diffuseFactor = KHR_materials_pbrSpecularGlossinessExtension.DIFFUSE_FACTOR_DEFAULT;
+                TextureInfo diffuseTexture = KHR_materials_pbrSpecularGlossinessExtension.DIFFUSE_TEXTURE_DEFAULT;
+                GLTF.Math.Vector3 specularFactor = KHR_materials_pbrSpecularGlossinessExtension.SPEC_FACTOR_DEFAULT;
+                double glossinessFactor = KHR_materials_pbrSpecularGlossinessExtension.GLOSS_FACTOR_DEFAULT;
+                TextureInfo specularGlossinessTexture = KHR_materials_pbrSpecularGlossinessExtension.SPECULAR_GLOSSINESS_TEXTURE_DEFAULT;
 
-			return false;
+
+                diffuseFactor = material.GetColor("_Color").ToNumericsColorGamma();
+                float floatDiffuse = material.GetVector("_DefVals").x;
+                diffuseFactor.R *= floatDiffuse;
+                diffuseFactor.G *= floatDiffuse;
+                diffuseFactor.B *= floatDiffuse;
+
+
+                Texture texAlbedoSpec = material.GetTexture("_MainTex");
+                Texture texGlos = Texture2D.whiteTexture;
+                Texture2D texSpecGlos = TextureConverter.ConvertAlbedoSpecGlosToSpecGloss(texAlbedoSpec, texGlos);
+                specularGlossinessTexture = exporter.ExportTextureInfo(texSpecGlos, TextureMapType.BaseColor);
+                exporter.ExportTextureTransform(specularGlossinessTexture, material, "_MainTex");
+
+
+                Material mat = new Material(Shader.Find("Hidden/SetAlpha"));
+                mat.SetFloat("_Alpha", 1f);
+                diffuseTexture = exporter.ExportTextureInfo(TextureConverter.Convert(texAlbedoSpec, mat), TextureMapType.BaseColor);
+                exporter.ExportTextureTransform(diffuseTexture, material, "_MainTex");
+
+
+                Color colorSpec = material.GetColor("_SpecColor");
+                float floatSpec = material.GetFloat("_SpecPower");
+                floatSpec = Mathf.Clamp01(floatSpec);
+                specularFactor.X = colorSpec.r * floatSpec;
+                specularFactor.Y = colorSpec.g * floatSpec;
+                specularFactor.Z = colorSpec.b * floatSpec;
+
+
+                float floatGlos = material.GetFloat("_SpecPower") * material.GetFloat("_Shininess");
+                glossinessFactor = floatGlos;
+
+
+                exporter.DeclareExtensionUsage(KHR_materials_pbrSpecularGlossinessExtensionFactory.EXTENSION_NAME, true);
+                if (materialNode.Extensions == null)
+                    materialNode.Extensions = new Dictionary<string, IExtension>();
+                materialNode.Extensions[KHR_materials_pbrSpecularGlossinessExtensionFactory.EXTENSION_NAME] = new KHR_materials_pbrSpecularGlossinessExtension(
+                    diffuseFactor,
+                    diffuseTexture,
+                    specularFactor,
+                    glossinessFactor,
+                    specularGlossinessTexture
+                );
+
+
+                var normalTex = material.GetTexture("_BumpMap");
+                if (normalTex && normalTex is Texture2D)
+                {
+                    materialNode.NormalTexture = exporter.ExportNormalTextureInfo(normalTex, TextureMapType.Normal, material);
+                    exporter.ExportTextureTransform(materialNode.NormalTexture, material, "_BumpMap");
+                }
+
+                return true;
+            }
+            else if (material.shader.name == "p0/Cutout/Bumped Diffuse")
+            {
+                material.EnableKeyword("_BUMPMAP");
+            }
+            else if (material.shader.name == "Global Fog/Transparent Reflective Specular")
+            {
+                var pbr = new PbrMetallicRoughness() { MetallicFactor = 0, RoughnessFactor = 1.0f };
+                pbr.BaseColorTexture = exporter.ExportTextureInfo(material.mainTexture, TextureMapType.BaseColor);
+                exporter.ExportTextureTransform(pbr.BaseColorTexture, material, "_MainTex");
+                pbr.BaseColorFactor = material.GetColor("_Color").ToNumericsColorLinear();
+                pbr.BaseColorFactor.A = 1f;
+
+                pbr.RoughnessFactor = 0f;
+                pbr.MetallicFactor = 0f;
+
+                KHR_materials_transmission transmission = new KHR_materials_transmission();
+                transmission.transmissionFactor = 1f;
+
+                exporter.DeclareExtensionUsage(KHR_materials_transmission_Factory.EXTENSION_NAME, true);
+                if (materialNode.Extensions == null)
+                    materialNode.Extensions = new Dictionary<string, IExtension>();
+                materialNode.Extensions[KHR_materials_transmission_Factory.EXTENSION_NAME] = transmission;
+
+                materialNode.PbrMetallicRoughness = pbr;
+                materialNode.AlphaMode = AlphaMode.MASK;
+
+                return true;
+            }
+
+            return false;
 		}
 	}
 }

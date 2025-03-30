@@ -27,6 +27,8 @@ namespace UnityGLTF.Plugins
         {
             if (material.shader.name.Contains("p0/Reflective/Bumped Specular SMap"))
             {
+                bool TransparentCutoff = material.shader.name.Contains("Transparent Cutoff");
+                
                 GLTF.Math.Color diffuseFactor = KHR_materials_pbrSpecularGlossinessExtension.DIFFUSE_FACTOR_DEFAULT;
                 TextureInfo diffuseTexture = KHR_materials_pbrSpecularGlossinessExtension.DIFFUSE_TEXTURE_DEFAULT;
                 GLTF.Math.Vector3 specularFactor = KHR_materials_pbrSpecularGlossinessExtension.SPEC_FACTOR_DEFAULT;
@@ -42,7 +44,11 @@ namespace UnityGLTF.Plugins
 
 
                 Texture texAlbedoSpec = material.GetTexture("_MainTex");
+                if (TransparentCutoff)
+                    texAlbedoSpec = material.GetTexture("_SpecMap"); // asinine thing, idk why this is
                 Texture texGlos = material.GetTexture("_SpecMap");
+                if (TransparentCutoff)
+                    texGlos = material.GetTexture("_MainTex"); // asinine thing, idk why this is
                 if (texGlos == null)
                     texGlos = Texture2D.whiteTexture;
                 Texture2D texSpecGlos = TextureConverter.ConvertAlbedoSpecGlosToSpecGloss(texAlbedoSpec, texGlos);
@@ -50,9 +56,13 @@ namespace UnityGLTF.Plugins
                 exporter.ExportTextureTransform(specularGlossinessTexture, material, "_MainTex");
 
 
+                if (TransparentCutoff)
+                    materialNode.AlphaMode = AlphaMode.MASK;
+
+
                 // todo: add tint mask logic
-                Material mat = new Material(Shader.Find("Hidden/SetAlpha"));
-                mat.SetFloat("_Alpha", 1f);
+                Material mat = new Material(Shader.Find("Hidden/SetAlphaFromTexture"));
+                mat.SetTexture("_AlphaTex", texGlos);
                 diffuseTexture = exporter.ExportTextureInfo(TextureConverter.Convert(texAlbedoSpec, mat), TextureMapType.BaseColor);
                 exporter.ExportTextureTransform(diffuseTexture, material, "_MainTex");
 

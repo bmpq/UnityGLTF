@@ -50,7 +50,9 @@ namespace UnityGLTF.Plugins
                 if (TransparentCutoff)
                     texGlos = material.GetTexture("_MainTex"); // asinine thing, idk why this is
                 if (texGlos == null)
-                    texGlos = Texture2D.whiteTexture;
+                    texGlos = Texture2D.whiteTexture; 
+                if (texAlbedoSpec == null)
+                    texAlbedoSpec = Texture2D.whiteTexture;
                 Texture2D texSpecGlos = TextureConverter.ConvertAlbedoSpecGlosToSpecGloss(texAlbedoSpec, texGlos);
 				specularGlossinessTexture = exporter.ExportTextureInfo(texSpecGlos, TextureMapType.BaseColor);
                 exporter.ExportTextureTransform(specularGlossinessTexture, material, "_MainTex");
@@ -118,6 +120,8 @@ namespace UnityGLTF.Plugins
 
 
                 Texture texAlbedoSpec = material.GetTexture("_MainTex");
+                if (texAlbedoSpec == null)
+                    texAlbedoSpec = Texture2D.whiteTexture;
                 Texture texGlos = Texture2D.whiteTexture;
                 Texture2D texSpecGlos = TextureConverter.ConvertAlbedoSpecGlosToSpecGloss(texAlbedoSpec, texGlos);
                 specularGlossinessTexture = exporter.ExportTextureInfo(texSpecGlos, TextureMapType.BaseColor);
@@ -232,6 +236,14 @@ namespace UnityGLTF.Plugins
 
                 materialNode.PbrMetallicRoughness = pbr;
 
+                return true;
+            }
+            else if (material.shader.name == "Custom/Vert Paint Shader Solid")
+            {
+                // unexportable
+                // the shader logic must be remade manually in blender
+
+                // skip exporting completely
                 return true;
             }
 

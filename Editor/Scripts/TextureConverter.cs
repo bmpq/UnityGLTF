@@ -98,7 +98,7 @@ namespace UnityGLTF
             int lastIndex = input.LastIndexOf(separator);
             if (lastIndex == -1)
             {
-                return replacement;
+                return input + separator + replacement;
             }
             return input.Substring(0, lastIndex + 1) + replacement;
         }

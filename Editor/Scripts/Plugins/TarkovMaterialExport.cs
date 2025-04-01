@@ -62,7 +62,6 @@ namespace UnityGLTF.Plugins
                     materialNode.AlphaMode = AlphaMode.MASK;
 
 
-                // todo: add tint mask logic
                 Material mat = new Material(Shader.Find("Hidden/SetAlphaFromTexture"));
                 mat.SetTexture("_AlphaTex", texGlos);
                 diffuseTexture = exporter.ExportTextureInfo(TextureConverter.Convert(texAlbedoSpec, mat), TextureMapType.BaseColor);
@@ -101,7 +100,14 @@ namespace UnityGLTF.Plugins
                     exporter.ExportTextureTransform(materialNode.NormalTexture, material, "_BumpMap");
                 }
 
-                if (material.shader.name.Contains("Emissive") && material.HasColor("_EmissiveColor"))
+                if (material.HasFloat("_HasTint") && material.GetFloat("_HasTint") > 0.5f)
+                {
+                    // export the tint mask as occlusion tex. just for the blender convenience.
+                    materialNode.OcclusionTexture = new OcclusionTextureInfo();
+                    materialNode.OcclusionTexture.Index = exporter.ExportTextureInfo(material.GetTexture("_TintMask"), TextureMapType.Linear).Index;
+                    exporter.ExportTextureTransform(materialNode.OcclusionTexture, material, "_TintMask");
+                }
+                else if (material.shader.name.Contains("Emissive") && material.HasColor("_EmissiveColor"))
                 {
                     materialNode.EmissiveTexture = exporter.ExportTextureInfo(material.GetTexture("_EmissionMap"), TextureMapType.BaseColor);
                     exporter.ExportTextureTransform(materialNode.EmissiveTexture, material, "_EmissionMap");

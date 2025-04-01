@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityGLTF.Cache;
 using Object = UnityEngine.Object;
 using WrapMode = GLTF.Schema.WrapMode;
+using WebP;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -157,15 +159,23 @@ namespace UnityGLTF
 		}
 
 		private void WriteRenderTextureToDiskAndRelease(RenderTexture destRenderTexture, string outputPath, bool linear)
-		{
-			RenderTexture.active = destRenderTexture;
+        {
+            // need to flip vertically for WebP exporting for some reason
+            RenderTexture flippedWebpRT = null;
+            if (outputPath.EndsWith(".webp"))
+            {
+                flippedWebpRT = RenderTexture.GetTemporary(destRenderTexture.descriptor);
+                Graphics.Blit(destRenderTexture, flippedWebpRT, new Vector2(1, -1), new Vector2(0, 1));
+                destRenderTexture = flippedWebpRT;
+            }
+
+            RenderTexture.active = destRenderTexture;
 
 			TextureFormat format = TextureFormat.ARGB32;
 			if (outputPath.EndsWith(".exr")) format = TextureFormat.RGBAFloat;
 			
 			var exportTexture = new Texture2D(destRenderTexture.width, destRenderTexture.height, format, false, linear);
 			exportTexture.ReadPixels(new Rect(0, 0, destRenderTexture.width, destRenderTexture.height), 0, 0);
-			//exportTexture.Apply();
 
 			byte[] binaryData;
 			if(outputPath.EndsWith(".jpg")) 
@@ -174,6 +184,10 @@ namespace UnityGLTF
 				binaryData = exportTexture.EncodeToPNG();
 			else if (outputPath.EndsWith(".exr"))
 				binaryData = exportTexture.EncodeToEXR(Texture2D.EXRFlags.CompressZIP);
+			else if (outputPath.EndsWith(".webp"))
+			{
+                binaryData = exportTexture.EncodeToWebP((float)settings.DefaultJpegQuality, out _);
+			}
 			else
 			{
 				Debug.LogError("Unsupported file extension: " + outputPath, destRenderTexture);
@@ -311,7 +325,10 @@ namespace UnityGLTF
 
 			var canExportAsJpeg = !textureHasAlpha && settings.UseTextureFileTypeHeuristic;
 			var desiredExtension = canExportAsJpeg ? ".jpg" : ".png";
-			if (textureSlot == TextureMapType.Custom_HDR)
+			if (settings.UseWebp)
+				desiredExtension = ".webp";
+
+            if (textureSlot == TextureMapType.Custom_HDR)
 				desiredExtension = ".exr";
 
 			if (!settings.ExportFullPath)

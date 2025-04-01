@@ -120,6 +120,7 @@ namespace UnityGLTF
 		private bool useTextureFileTypeHeuristic = true;
 		[SerializeField] [Tooltip("Quality setting for exported JPEG files.")]
 		private int defaultJpegQuality = 90;
+        [SerializeField] private bool useWebp = true;
         [SerializeField]
         private bool overwriteTextureSameName = false;
 
@@ -157,6 +158,7 @@ namespace UnityGLTF
 		public bool RequireExtensions { get => requireExtensions; set => requireExtensions = value; }
 		public bool TryExportTexturesFromDisk { get => tryExportTexturesFromDisk; set => tryExportTexturesFromDisk = value; }
 		public bool UseTextureFileTypeHeuristic { get => useTextureFileTypeHeuristic; set => useTextureFileTypeHeuristic = value; }
+		public bool UseWebp { get => useWebp; set => useWebp = value; }
 		public bool ExportVertexColors { get => exportVertexColors; set => exportVertexColors = value; }
 		public int DefaultJpegQuality { get => defaultJpegQuality; set => defaultJpegQuality = value; }
 		public bool ExportDisabledGameObjects { get => exportDisabledGameObjects; set => exportDisabledGameObjects = value; }

@@ -28,7 +28,15 @@ namespace UnityGLTF
         {
             gltfSettings.SaveFolderPath = EditorGUILayout.TextField("Export path", "T:/export/gltfscenes");
 
-            gltfSettings.OverwriteTextureSameName = GUILayout.Toggle(gltfSettings.OverwriteTextureSameName, "Overwrite textures with the same name");
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("Textures", EditorStyles.boldLabel);
+            gltfSettings.UseWebp = EditorGUILayout.Toggle("WebP format", gltfSettings.UseWebp);
+            if (gltfSettings.UseWebp)
+                gltfSettings.DefaultJpegQuality = EditorGUILayout.IntSlider("Quality", gltfSettings.DefaultJpegQuality, 0, 100);
+
+            gltfSettings.OverwriteTextureSameName = GUILayout.Toggle(gltfSettings.OverwriteTextureSameName, "Overwrite files with the same name");
+            EditorGUILayout.EndVertical();
+
 
             if (GUILayout.Button($"Preprocess all LODs"))
             {

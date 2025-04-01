@@ -201,7 +201,8 @@ namespace UnityGLTF.Plugins
                 pbr.BaseColorFactor = material.GetColor("_Color").ToNumericsColorLinear();
                 pbr.BaseColorFactor.A = 1f;
 
-                pbr.RoughnessFactor = 0f;
+                pbr.MetallicRoughnessTexture = pbr.BaseColorTexture;
+                pbr.RoughnessFactor = 1f;
                 pbr.MetallicFactor = 0f;
 
                 KHR_materials_transmission transmission = new KHR_materials_transmission();
@@ -213,7 +214,7 @@ namespace UnityGLTF.Plugins
                 materialNode.Extensions[KHR_materials_transmission_Factory.EXTENSION_NAME] = transmission;
 
                 materialNode.PbrMetallicRoughness = pbr;
-                materialNode.AlphaMode = AlphaMode.MASK;
+                materialNode.AlphaMode = AlphaMode.BLEND;
 
                 return true;
             }

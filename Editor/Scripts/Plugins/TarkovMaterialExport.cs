@@ -25,7 +25,7 @@ namespace UnityGLTF.Plugins
 
 		public override bool BeforeMaterialExport(GLTFSceneExporter exporter, GLTFRoot gltfRoot, Material material, GLTFMaterial materialNode)
         {
-            if (material.shader.name.Contains("p0/Reflective/Bumped Specular SMap"))
+            if (material.shader.name.Contains("SMap") && material.shader.name.Contains("Reflective"))
             {
                 bool TransparentCutoff = material.shader.name.Contains("Transparent Cutoff");
                 
@@ -99,6 +99,21 @@ namespace UnityGLTF.Plugins
                 {
                     materialNode.NormalTexture = exporter.ExportNormalTextureInfo(normalTex, TextureMapType.Normal, material);
                     exporter.ExportTextureTransform(materialNode.NormalTexture, material, "_BumpMap");
+                }
+
+                if (material.shader.name.Contains("Emissive") && material.HasColor("_EmissiveColor"))
+                {
+                    materialNode.EmissiveTexture = exporter.ExportTextureInfo(material.GetTexture("_EmissionMap"), TextureMapType.BaseColor);
+                    exporter.ExportTextureTransform(materialNode.EmissiveTexture, material, "_EmissionMap");
+
+                    materialNode.EmissiveFactor = material.GetColor("_EmissiveColor").ToNumericsColorGamma();
+
+
+                    KHR_materials_emissive_strength emissive = new KHR_materials_emissive_strength();
+                    emissive.emissiveStrength = material.GetFloat("_EmissionPower") * material.GetFloat("_EmissionVisibility");
+
+                    exporter.DeclareExtensionUsage(KHR_materials_emissive_strength_Factory.EXTENSION_NAME, true);
+                    materialNode.Extensions[KHR_materials_emissive_strength_Factory.EXTENSION_NAME] = emissive;
                 }
 
                 return true;

@@ -54,7 +54,7 @@ namespace UnityGLTF.Plugins
                 if (texAlbedoSpec == null)
                     texAlbedoSpec = Texture2D.whiteTexture;
                 Texture2D texSpecGlos = TextureConverter.ConvertAlbedoSpecGlosToSpecGloss(texAlbedoSpec, texGlos);
-				specularGlossinessTexture = exporter.ExportTextureInfo(texSpecGlos, TextureMapType.BaseColor);
+				specularGlossinessTexture = exporter.ExportTextureInfo(texSpecGlos, TextureMapType.Linear);
                 exporter.ExportTextureTransform(specularGlossinessTexture, material, "_MainTex");
 
 
@@ -62,9 +62,9 @@ namespace UnityGLTF.Plugins
                     materialNode.AlphaMode = AlphaMode.MASK;
 
 
-                Material mat = new Material(Shader.Find("Hidden/SetAlphaFromTexture"));
-                mat.SetTexture("_AlphaTex", texGlos);
-                diffuseTexture = exporter.ExportTextureInfo(TextureConverter.Convert(texAlbedoSpec, mat), TextureMapType.BaseColor);
+                Material setAlpha = new Material(Shader.Find("Hidden/SetAlphaFromTexture"));
+                setAlpha.SetTexture("_AlphaTex", texGlos);
+                diffuseTexture = exporter.ExportTextureInfo(TextureConverter.Convert(texAlbedoSpec, setAlpha), TextureMapType.BaseColor);
                 exporter.ExportTextureTransform(diffuseTexture, material, "_MainTex");
 
 
@@ -145,7 +145,7 @@ namespace UnityGLTF.Plugins
                     texAlbedoSpec = Texture2D.whiteTexture;
                 Texture texGlos = Texture2D.whiteTexture;
                 Texture2D texSpecGlos = TextureConverter.ConvertAlbedoSpecGlosToSpecGloss(texAlbedoSpec, texGlos);
-                specularGlossinessTexture = exporter.ExportTextureInfo(texSpecGlos, TextureMapType.BaseColor);
+                specularGlossinessTexture = exporter.ExportTextureInfo(texSpecGlos, TextureMapType.Linear);
                 exporter.ExportTextureTransform(specularGlossinessTexture, material, "_MainTex");
 
 
@@ -183,7 +183,8 @@ namespace UnityGLTF.Plugins
                 if (normalTex && normalTex is Texture2D)
                 {
                     materialNode.NormalTexture = exporter.ExportNormalTextureInfo(normalTex, TextureMapType.Normal, material);
-                    exporter.ExportTextureTransform(materialNode.NormalTexture, material, "_BumpMap");
+                    // exporter.ExportTextureTransform(materialNode.NormalTexture, material, "_BumpMap");
+                    // the tex tiling isn't used in-game, but some materials have random values, so we omit exporting tex transform
                 }
 
                 return true;

@@ -21,7 +21,7 @@ namespace UnityGLTF
 
     public static class TextureConverter
     {
-        public static Texture2D Convert(Texture inputTexture, Material mat, string replaceTag = null)
+        public static Texture2D Convert(Texture inputTexture, Material mat, string addTag = null)
         {
             bool sRGBWrite = GL.sRGBWrite;
             GL.sRGBWrite = false;
@@ -34,10 +34,9 @@ namespace UnityGLTF
             RenderTexture.ReleaseTemporary(temporary);
             GL.sRGBWrite = sRGBWrite;
 
-            if (!string.IsNullOrEmpty(replaceTag))
-                convertedTexture.name = ReplaceLastWord(inputTexture.name, '_', replaceTag);
-            else 
-                convertedTexture.name = inputTexture.name;
+            convertedTexture.name = inputTexture.name;
+            if (!string.IsNullOrEmpty(addTag))
+                convertedTexture.name += $"_{addTag}";
 
             return convertedTexture;
         }
@@ -55,7 +54,8 @@ namespace UnityGLTF
             Graphics.Blit(inputTextureAlbedoSpec, temporary, mat);
 
             Texture2D convertedTexture = temporary.ToTexture2D();
-            convertedTexture.name = ReplaceLastWord(inputTextureAlbedoSpec.name, '_', "SPECGLOS");
+
+            convertedTexture.name = inputTextureAlbedoSpec.name + "_SPECGLOS";
 
             RenderTexture.ReleaseTemporary(temporary);
             GL.sRGBWrite = sRGBWrite;
@@ -75,7 +75,7 @@ namespace UnityGLTF
             Graphics.Blit(inputTexture, temporary, mat);
 
             Texture2D convertedTexture = temporary.ToTexture2D();
-            convertedTexture.name = ReplaceLastWord(inputTexture.name, '_', "INVERTED");
+            convertedTexture.name = inputTexture.name + "_INVERTED";
 
             RenderTexture.ReleaseTemporary(temporary);
             GL.sRGBWrite = sRGBWrite;
@@ -91,16 +91,6 @@ namespace UnityGLTF
             tex.Apply();
 
             return tex;
-        }
-
-        public static string ReplaceLastWord(this string input, char separator, string replacement)
-        {
-            int lastIndex = input.LastIndexOf(separator);
-            if (lastIndex == -1)
-            {
-                return input + separator + replacement;
-            }
-            return input.Substring(0, lastIndex + 1) + replacement;
         }
 
         public static Texture2D CreateSolidColorTexture(int width, int height, float r, float g, float b, float a)

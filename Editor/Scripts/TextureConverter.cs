@@ -75,7 +75,7 @@ namespace UnityGLTF
             Graphics.Blit(inputTexture, temporary, mat);
 
             Texture2D convertedTexture = temporary.ToTexture2D();
-            convertedTexture.name = inputTexture.name + "_INVERTED";
+            convertedTexture.name = inputTexture.name;
 
             RenderTexture.ReleaseTemporary(temporary);
             GL.sRGBWrite = sRGBWrite;

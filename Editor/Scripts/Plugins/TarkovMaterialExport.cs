@@ -218,7 +218,50 @@ namespace UnityGLTF.Plugins
 
                 return true;
             }
-            else if (material.shader.name == "Cloth/ClothShader")
+            else if (material.shader.name.Contains("Transparent/DepthZwrite"))
+            {
+                var pbr = new PbrMetallicRoughness() { MetallicFactor = 0, RoughnessFactor = 1.0f };
+
+                Material channelMixer = new Material(Shader.Find("Hidden/ChannelMixer"));
+                Texture2D texMain = TextureConverter.Invert(material.GetTexture("_MainTex"));
+                channelMixer.SetTexture("_TexFirst", texMain);
+                channelMixer.SetTexture("_TexSecond", Texture2D.whiteTexture);
+                channelMixer.SetFloat("_SourceR", (int)ChannelSource.TexFirst_Alpha);
+                channelMixer.SetFloat("_SourceG", (int)ChannelSource.TexFirst_Alpha);
+                channelMixer.SetFloat("_SourceB", (int)ChannelSource.TexFirst_Alpha);
+                channelMixer.SetFloat("_SourceA", (int)ChannelSource.TexSecond_Red);
+                Texture2D texTransmission = TextureConverter.Convert(texMain, channelMixer, "TRANSMISSION");
+                texTransmission = TextureConverter.Invert(texTransmission);
+
+                pbr.BaseColorFactor = material.GetColor("_Color").ToNumericsColorGamma();
+                pbr.BaseColorFactor.A = 1f;
+
+                pbr.RoughnessFactor = 0f;
+                pbr.MetallicFactor = 0f;
+
+                KHR_materials_transmission transmission = new KHR_materials_transmission();
+                transmission.transmissionFactor = 1f;
+                transmission.transmissionTexture = exporter.ExportTextureInfo(texTransmission, TextureMapType.Linear);
+                exporter.ExportTextureTransform(pbr.BaseColorTexture, material, "_MainTex");
+
+                exporter.DeclareExtensionUsage(KHR_materials_transmission_Factory.EXTENSION_NAME, true);
+                if (materialNode.Extensions == null)
+                    materialNode.Extensions = new Dictionary<string, IExtension>();
+                materialNode.Extensions[KHR_materials_transmission_Factory.EXTENSION_NAME] = transmission;
+
+                materialNode.PbrMetallicRoughness = pbr;
+
+
+                var normalTex = material.GetTexture("_BumpMap");
+                if (normalTex && normalTex is Texture2D)
+                {
+                    materialNode.NormalTexture = exporter.ExportNormalTextureInfo(normalTex, TextureMapType.Normal, material);
+                    exporter.ExportTextureTransform(materialNode.NormalTexture, material, "_BumpMap");
+                }
+
+                return true;
+            }
+            else if (material.shader.name.Contains("Cloth/ClothShader"))
             {
                 var pbr = new PbrMetallicRoughness();
 

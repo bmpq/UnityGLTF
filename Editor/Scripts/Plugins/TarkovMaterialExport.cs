@@ -157,7 +157,7 @@ namespace UnityGLTF.Plugins
 
                 Color colorSpec = material.GetColor("_SpecColor");
                 float floatSpec = material.GetFloat("_SpecPower");
-                floatSpec = Mathf.Clamp01(floatSpec);
+                floatSpec = Mathf.Clamp01(floatSpec / 10f);
                 specularFactor.X = colorSpec.r * floatSpec;
                 specularFactor.Y = colorSpec.g * floatSpec;
                 specularFactor.Z = colorSpec.b * floatSpec;

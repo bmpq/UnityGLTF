@@ -260,16 +260,34 @@ namespace UnityGLTF.Plugins
 
                 return true;
             }
-            else if (material.shader.name == "Custom/Vert Paint Shader Solid")
+            else if (material.shader.name.Contains("Vert Paint Shader"))
             {
                 // unexportable
                 // the shader logic must be remade manually in blender
 
-                // skip exporting completely
+                // just export the textures for finding convenience, need to deal with them manually later
+                exporter.ExportTextureInfo(material.GetTexture("_Heights"), TextureMapType.Linear);
+
+                exporter.ExportTextureInfo(material.GetTexture("_MainTex0"), TextureMapType.Linear);
+                exporter.ExportTextureInfo(material.GetTexture("_MainTex1"), TextureMapType.Linear);
+                exporter.ExportTextureInfo(material.GetTexture("_MainTex2"), TextureMapType.Linear);
+
+                exporter.ExportTextureInfo(material.GetTexture("_BumpMap0"), TextureMapType.Normal);
+                exporter.ExportTextureInfo(material.GetTexture("_BumpMap1"), TextureMapType.Normal);
+                exporter.ExportTextureInfo(material.GetTexture("_BumpMap2"), TextureMapType.Normal);
+
+                if (material.shader.name.Contains("Gloss"))
+                {
+                    exporter.ExportTextureInfo(material.GetTexture("_SpecTex0"), TextureMapType.Linear);
+                    exporter.ExportTextureInfo(material.GetTexture("_SpecTex1"), TextureMapType.Linear);
+                    exporter.ExportTextureInfo(material.GetTexture("_SpecTex2"), TextureMapType.Linear);
+                }
+
+                // skip material exporting completely
                 return true;
             }
 
             return false;
 		}
-	}
+    }
 }

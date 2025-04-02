@@ -337,6 +337,9 @@ namespace UnityGLTF
 			// walk submeshes and export the ones with non-null meshes
 			for (int id = 0; id < maxOfSubMeshesAndMaterials; id++)
 			{
+				if (materialsObj.Length == 0)
+					continue;
+
 				var mat = materialsObj[id % materialsObj.Length];
 				var submesh = id % meshObj.subMeshCount;
 				

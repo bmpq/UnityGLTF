@@ -23,6 +23,9 @@ namespace UnityGLTF
     {
         public static Texture2D Convert(Texture inputTexture, Material mat, string addTag = null)
         {
+            if (inputTexture == null)
+                return null;
+
             bool sRGBWrite = GL.sRGBWrite;
             GL.sRGBWrite = false;
             RenderTexture temporary = RenderTexture.GetTemporary(inputTexture.width, inputTexture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
@@ -65,6 +68,8 @@ namespace UnityGLTF
 
         public static Texture2D Invert(Texture inputTexture)
         {
+            if (inputTexture == null) return null;
+
             Material mat = new Material(Shader.Find("Hidden/Invert"));
             mat.SetTexture("_MainTex", inputTexture);
 

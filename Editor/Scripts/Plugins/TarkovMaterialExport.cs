@@ -330,8 +330,37 @@ namespace UnityGLTF.Plugins
                 // skip material exporting completely
                 return true;
             }
+            else if (material.shader.name == "Decal/Ultra Deferred Decal Of God 3000")
+            {
+                var pbr = new PbrMetallicRoughness();
+
+                pbr.BaseColorFactor = Vector4ToColor(material.GetVector("_Color")).ToNumericsColorGamma();
+
+                var baseTex = material.GetTexture("_MainTex");
+                if (baseTex)
+                {
+                    pbr.BaseColorTexture = exporter.ExportTextureInfo(material.GetTexture("_MainTex"), TextureMapType.BaseColor);
+                    exporter.ExportTextureTransform(pbr.BaseColorTexture, material, "_MainTex");
+                }
+
+                pbr.MetallicFactor = 0f;
+                pbr.RoughnessFactor = 0.85f;
+
+                materialNode.PbrMetallicRoughness = pbr;
+
+                materialNode.AlphaMode = AlphaMode.BLEND;
+
+                var normalTex = material.GetTexture("_BumpMap");
+                if (normalTex && normalTex is Texture2D)
+                {
+                    materialNode.NormalTexture = exporter.ExportNormalTextureInfo(normalTex, TextureMapType.Normal, material);
+                    exporter.ExportTextureTransform(materialNode.NormalTexture, material, "_BumpMap");
+                }
+            }
 
             return false;
 		}
+
+        static Color Vector4ToColor(Vector4 vector4) => new Color(vector4.x, vector4.y, vector4.z, vector4.w);
     }
 }

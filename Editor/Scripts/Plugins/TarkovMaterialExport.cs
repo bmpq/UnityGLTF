@@ -124,7 +124,7 @@ namespace UnityGLTF.Plugins
 
                 return true;
 			}
-            else if (material.shader.name == "p0/Reflective/Bumped Specular")
+            else if (material.shader.name == "p0/Reflective/Bumped Specular" || material.shader.name == "p0/Reflective/Bumped Emissive Specular")
             {
                 GLTF.Math.Color diffuseFactor = KHR_materials_pbrSpecularGlossinessExtension.DIFFUSE_FACTOR_DEFAULT;
                 TextureInfo diffuseTexture = KHR_materials_pbrSpecularGlossinessExtension.DIFFUSE_TEXTURE_DEFAULT;
@@ -185,6 +185,18 @@ namespace UnityGLTF.Plugins
                     materialNode.NormalTexture = exporter.ExportNormalTextureInfo(normalTex, TextureMapType.Normal, material);
                     // exporter.ExportTextureTransform(materialNode.NormalTexture, material, "_BumpMap");
                     // the tex tiling isn't used in-game, but some materials have random values, so we omit exporting tex transform
+                }
+
+                if (material.HasFloat("_EmissionVisibility"))
+                {
+                    materialNode.EmissiveTexture = exporter.ExportTextureInfo(material.GetTexture("_EmissionMap"), TextureMapType.BaseColor);
+                    exporter.ExportTextureTransform(materialNode.EmissiveTexture, material, "_EmissionMap");
+
+                    KHR_materials_emissive_strength emissive = new KHR_materials_emissive_strength();
+                    emissive.emissiveStrength = material.GetFloat("_EmissionPower") * material.GetFloat("_EmissionVisibility");
+
+                    exporter.DeclareExtensionUsage(KHR_materials_emissive_strength_Factory.EXTENSION_NAME, true);
+                    materialNode.Extensions[KHR_materials_emissive_strength_Factory.EXTENSION_NAME] = emissive;
                 }
 
                 return true;

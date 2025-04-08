@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityGLTF;
 using UnityGLTF.Plugins;
+using System.Reflection;
 
 namespace UnityGLTF
 {
@@ -41,6 +43,12 @@ namespace UnityGLTF
             EditorGUILayout.EndVertical();
 
 
+
+            if (GUILayout.Button($"Preprocess all GameObjects"))
+            {
+                PreprocessGameObjects();
+            }
+
             if (GUILayout.Button($"Preprocess all LODs"))
             {
                 PreprocessLODs();
@@ -48,9 +56,60 @@ namespace UnityGLTF
 
             if (GUILayout.Button($"Preprocess & Export All"))
             {
+                PreprocessGameObjects();
                 PreprocessLODs();
                 ExportScenes(gltfSettings);
             }
+        }
+
+        void PreprocessGameObjects()
+        {
+            string[] typesToDisable = new string[] { "GripPose" };
+
+            for (int i = 0; i < typesToDisable.Length; i++)
+            {
+                Type targetType = FindTypeByName(typesToDisable[i]);
+                UnityEngine.Object[] foundComponents = UnityEngine.Object.FindObjectsOfType(targetType, false);
+                foreach (UnityEngine.Object foundComponent in foundComponents)
+                {
+                    if (foundComponent is Component comp)
+                        comp.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        public static Type FindTypeByName(string typeName)
+        {
+            if (string.IsNullOrEmpty(typeName)) return null;
+
+            Type type = Type.GetType(typeName);
+            if (type != null) return type;
+
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                try
+                {
+                    type = assembly.GetType(typeName, false);
+                    if (type != null) return type;
+
+                    // Try finding by simple name (more expensive)
+                    if (!typeName.Contains('.'))
+                    {
+                        type = assembly.GetTypes().FirstOrDefault(t => t.Name == typeName);
+                        if (type != null) return type;
+                    }
+                }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    Debug.LogWarning($"Could not load types from assembly {assembly.FullName}: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning($"Error searching assembly {assembly.FullName} for type '{typeName}': {ex.Message}");
+                }
+            }
+
+            return null;
         }
 
         void PreprocessLODs()

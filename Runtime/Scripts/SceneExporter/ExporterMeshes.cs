@@ -293,20 +293,12 @@ namespace UnityGLTF
 						var uvs = new List<Vector2>(meshObj.vertexCount);
 						meshObj.GetUVs(2, uvs);
 						aTexcoord2 = ExportAccessor(uvs.ToArray());
-					}
-					else if (uvDim2 == 3)
-					{
-						var uvs = new List<Vector3>(meshObj.vertexCount);
-						meshObj.GetUVs(2, uvs);
-						aTexcoord2 = ExportAccessor(uvs.ToArray());
-					}
-					else if (uvDim2 == 4)
-					{
-						var uvs = new List<Vector4>(meshObj.vertexCount);
-						meshObj.GetUVs(2, uvs);
-						aTexcoord2 = ExportAccessor(uvs.ToArray());
-					}
-				}
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Mesh '{meshObj.name}' has TEXCOORD_2 (uv3) with dimension {uvDim2}. glTF requires TEXCOORD_n to be VEC2. Skipping TEXCOORD_2 export for this mesh.", meshObj);
+                    }
+                }
 
 				if (settings.ExportVertexColors && meshObj.colors.Length != 0)
 					aColor0 = ExportAccessor(QualitySettings.activeColorSpace == ColorSpace.Linear ? meshObj.colors : meshObj.colors.ToLinear(), true);

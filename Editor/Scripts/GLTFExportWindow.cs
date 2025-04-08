@@ -26,7 +26,10 @@ namespace UnityGLTF
 
         void OnGUI()
         {
-            gltfSettings.SaveFolderPath = EditorGUILayout.TextField("Export path", "T:/export/gltfscenes");
+            if (gltfSettings == null)
+                gltfSettings = GLTFSettings.GetOrCreateSettings();
+
+            gltfSettings.SaveFolderPath = EditorGUILayout.TextField("Export path", gltfSettings.SaveFolderPath);
 
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             EditorGUILayout.LabelField("Textures", EditorStyles.boldLabel);
@@ -54,15 +57,17 @@ namespace UnityGLTF
         {
             Dictionary<GameObject, bool> origActiveState = new Dictionary<GameObject, bool>();
 
-            LODGroup[] lodGroups = FindObjectsOfType<LODGroup>();
+            LODGroup[] lodGroups = FindObjectsOfType<LODGroup>(true);
 
             foreach (var lodGroup in lodGroups)
             {
+                lodGroup.enabled = true;
                 for (int i = 0; i < lodGroup.GetLODs().Length; i++)
                 {
                     foreach (var rend in lodGroup.GetLODs()[i].renderers)
                     {
                         if (rend == null) continue;
+                        rend.enabled = true;
 
                         bool shadow = rend.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
 
@@ -99,7 +104,7 @@ namespace UnityGLTF
 
             GLTFSceneExporter exporter = new GLTFSceneExporter(GetAllRootTransforms(), new ExportContext(settings));
 
-            string sceneName = "scene";
+            string sceneName = SceneManager.GetActiveScene().name;
 
             exporter.SaveGLTFandBin(settings.SaveFolderPath, sceneName);
 

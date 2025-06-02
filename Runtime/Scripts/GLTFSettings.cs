@@ -334,7 +334,10 @@ namespace UnityGLTF
 				    }
 				    catch (ReflectionTypeLoadException e)
 				    {
-					    types.AddRange(e.Types);
+                        if (e.Types != null)
+                        {
+                            types.AddRange(e.Types.Where(loadedType => loadedType != null));
+                        }
 				    }
 				    catch (Exception)
 				    {

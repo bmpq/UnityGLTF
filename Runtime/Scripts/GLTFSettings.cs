@@ -146,7 +146,9 @@ namespace UnityGLTF
 
 		[Header("Export Textures")]
 		[SerializeField]
-		[Tooltip("(Experimental) Exports PNG/JPEG directly from disk instead of re-encoding from Unity's import result. No channel repacking will happen for these textures. Textures in other formats (PSD, TGA etc) not supported by glTF and in-memory textures (e.g. RenderTextures) are always re-encoded.")]
+        [Tooltip("")]
+        private bool convertTextures = false;
+        [Tooltip("(Experimental) Exports PNG/JPEG directly from disk instead of re-encoding from Unity's import result. No channel repacking will happen for these textures. Textures in other formats (PSD, TGA etc) not supported by glTF and in-memory textures (e.g. RenderTextures) are always re-encoded.")]
 		private bool tryExportTexturesFromDisk = false;
 		[SerializeField] [Tooltip("Determines texture export type (PNG or JPEG) based on alpha channel. When false, always exports lossless PNG files.")]
 		private bool useTextureFileTypeHeuristic = true;
@@ -184,6 +186,11 @@ namespace UnityGLTF
 		public bool ExportNames { get => exportNames; set  => exportNames = value; }
 		public bool ExportFullPath { get => exportFullPath; set => exportFullPath = value; }
 		public bool UseMainCameraVisibility { get => useMainCameraVisibility; set => useMainCameraVisibility = value; }
+
+        /// <summary>
+        /// converting is only possible if you patch the Resource.Load (with your mod) to intercept and load your custom bundle that has those shaders! (in this repo dir: Resources)
+        /// </summary>
+        public bool ConvertTextures { get => convertTextures; set => convertTextures = value; }
 		public bool TryExportTexturesFromDisk { get => tryExportTexturesFromDisk; set => tryExportTexturesFromDisk = value; }
 		public bool UseTextureFileTypeHeuristic { get => useTextureFileTypeHeuristic; set => useTextureFileTypeHeuristic = value; }
 		public bool ExportVertexColors { get => exportVertexColors; set => exportVertexColors = value; }

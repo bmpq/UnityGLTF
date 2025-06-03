@@ -643,14 +643,25 @@ namespace UnityGLTF
 
 			_exportLayerMask = _exportContext.ExportLayers;
 
-			var metalGlossChannelSwapShader = Resources.Load("MetalGlossChannelSwap", typeof(Shader)) as Shader;
-			_metalGlossChannelSwapMaterial = new Material(metalGlossChannelSwapShader);
+			if (context.settings.ConvertTextures)
+			{
+				var metalGlossChannelSwapShader = Resources.Load("MetalGlossChannelSwap", typeof(Shader)) as Shader;
+				_metalGlossChannelSwapMaterial = new Material(metalGlossChannelSwapShader);
 
-			var metalGlossOcclusionChannelSwapShader = Resources.Load("MetalGlossOcclusionChannelSwap", typeof(Shader)) as Shader;
-			_metalGlossOcclusionChannelSwapMaterial = new Material(metalGlossOcclusionChannelSwapShader);
-			
-			var normalChannelShader = Resources.Load("NormalChannel", typeof(Shader)) as Shader;
-			_normalChannelMaterial = new Material(normalChannelShader);
+				var metalGlossOcclusionChannelSwapShader = Resources.Load("MetalGlossOcclusionChannelSwap", typeof(Shader)) as Shader;
+				_metalGlossOcclusionChannelSwapMaterial = new Material(metalGlossOcclusionChannelSwapShader);
+
+				var normalChannelShader = Resources.Load("NormalChannel", typeof(Shader)) as Shader;
+				_normalChannelMaterial = new Material(normalChannelShader);
+			}
+			else
+			{
+                Shader shader = Shader.Find("Hidden/Internal-Colored");
+
+                _metalGlossChannelSwapMaterial = new Material(shader);
+                _metalGlossOcclusionChannelSwapMaterial = new Material(shader);
+                _normalChannelMaterial = new Material(shader);
+            }
 
 			// Remove invalid transforms
 			_rootTransforms = rootTransforms?.Where(x => x).ToArray() ?? Array.Empty<Transform>();

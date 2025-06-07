@@ -154,6 +154,8 @@ namespace UnityGLTF
 		private bool useTextureFileTypeHeuristic = true;
 		[SerializeField] [Tooltip("Quality setting for exported JPEG files.")]
 		private int defaultJpegQuality = 90;
+        [SerializeField] [Tooltip("Override textures with the same name.")]
+        private bool overrideTexturesName = false;
 
 		[Header("Export Animation")]
 		[SerializeField]
@@ -193,6 +195,7 @@ namespace UnityGLTF
         public bool ConvertTextures { get => convertTextures; set => convertTextures = value; }
 		public bool TryExportTexturesFromDisk { get => tryExportTexturesFromDisk; set => tryExportTexturesFromDisk = value; }
 		public bool UseTextureFileTypeHeuristic { get => useTextureFileTypeHeuristic; set => useTextureFileTypeHeuristic = value; }
+		public bool OverrideTexturesName { get => overrideTexturesName; set => overrideTexturesName = value; }
 		public bool ExportVertexColors { get => exportVertexColors; set => exportVertexColors = value; }
 		public int DefaultJpegQuality { get => defaultJpegQuality; set => defaultJpegQuality = value; }
 		public bool ExportDisabledGameObjects { get => exportDisabledGameObjects; set => exportDisabledGameObjects = value; }

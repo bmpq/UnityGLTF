@@ -152,7 +152,9 @@ namespace UnityGLTF
 		private bool tryExportTexturesFromDisk = false;
 		[SerializeField] [Tooltip("Determines texture export type (PNG or JPEG) based on alpha channel. When false, always exports lossless PNG files.")]
 		private bool useTextureFileTypeHeuristic = true;
-		[SerializeField] [Tooltip("Quality setting for exported JPEG files.")]
+        [SerializeField] [Tooltip("WebP is like JPEG but with better compression and an alpha channel.")]
+        private bool useWebp = false;
+        [SerializeField] [Tooltip("Quality setting for exported JPEG files.")]
 		private int defaultJpegQuality = 90;
         [SerializeField] [Tooltip("Override textures with the same name.")]
         private bool overrideTexturesName = false;
@@ -197,6 +199,7 @@ namespace UnityGLTF
 		public bool UseTextureFileTypeHeuristic { get => useTextureFileTypeHeuristic; set => useTextureFileTypeHeuristic = value; }
 		public bool OverrideTexturesName { get => overrideTexturesName; set => overrideTexturesName = value; }
 		public bool ExportVertexColors { get => exportVertexColors; set => exportVertexColors = value; }
+		public bool UseWebp { get => useWebp; set => useWebp = value; }
 		public int DefaultJpegQuality { get => defaultJpegQuality; set => defaultJpegQuality = value; }
 		public bool ExportDisabledGameObjects { get => exportDisabledGameObjects; set => exportDisabledGameObjects = value; }
 		public bool ExportAnimations { get => exportAnimations; set => exportAnimations = value; }

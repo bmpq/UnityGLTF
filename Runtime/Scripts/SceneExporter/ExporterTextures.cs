@@ -168,12 +168,14 @@ namespace UnityGLTF
 			//exportTexture.Apply();
 
 			byte[] binaryData;
-			if(outputPath.EndsWith(".jpg")) 
+			if (outputPath.EndsWith(".jpg"))
 				binaryData = exportTexture.EncodeToJPG(settings.DefaultJpegQuality);
-			else if(outputPath.EndsWith(".png"))
+			else if (outputPath.EndsWith(".png"))
 				binaryData = exportTexture.EncodeToPNG();
 			else if (outputPath.EndsWith(".exr"))
 				binaryData = exportTexture.EncodeToEXR(Texture2D.EXRFlags.CompressZIP);
+			else if (outputPath.EndsWith(".webp	"))
+				binaryData = exportTexture.EncodeToWEBP(settings.DefaultJpegQuality);
 			else
 			{
 				Debug.LogError("Unsupported file extension: " + outputPath, destRenderTexture);
@@ -243,7 +245,7 @@ namespace UnityGLTF
 		    }
 		    else
 		    {
-				texture.Source = ExportImage(uniqueTexture, textureSlot);
+				texture.Source = ExportImage(uniqueTexture, textureSlot, settings.UseWebp);
 		    }
 			texture.Sampler = ExportSampler(textureObj);
 
@@ -279,7 +281,7 @@ namespace UnityGLTF
 		/// The actual export happens in ExportImages.
 		/// </summary>
 		/// <returns>The relative texture output path on disk, including extension</returns>
-		private string GetImageOutputPath(Texture texture, TextureExportSettings textureMapType, string textureSlot, out bool ableToExportFromDisk)
+		private string GetImageOutputPath(Texture texture, TextureExportSettings textureMapType, string textureSlot, out bool ableToExportFromDisk, bool webp)
 		{
 			var imagePath = _exportContext.TexturePathRetriever(texture);
 			if (string.IsNullOrEmpty(imagePath))
@@ -313,6 +315,8 @@ namespace UnityGLTF
 			var desiredExtension = canExportAsJpeg ? ".jpg" : ".png";
 			if (textureSlot == TextureMapType.Custom_HDR)
 				desiredExtension = ".exr";
+			if (webp)
+				desiredExtension = "webp";
 
 			if (!settings.ExportFullPath)
 			{
@@ -332,7 +336,7 @@ namespace UnityGLTF
 			return imagePath;
 		}
 
-		private ImageId ExportImage(UniqueTexture uniqueTexture, string textureSlot)
+		private ImageId ExportImage(UniqueTexture uniqueTexture, string textureSlot, bool webp)
 		{
 			var texture = uniqueTexture.Texture;
 			var width = uniqueTexture.GetWidth();
@@ -375,7 +379,7 @@ namespace UnityGLTF
             }
 #endif
 
-			var filenamePath = GetImageOutputPath(texture, uniqueTexture.ExportSettings, textureSlot, out var canBeExportedFromDisk);
+			var filenamePath = GetImageOutputPath(texture, uniqueTexture.ExportSettings, textureSlot, out var canBeExportedFromDisk, webp);
 
 			// some characters such as # are allowed as part of an URI and are thus not escaped
 			// by EscapeUriString. They need to be escaped if they're part of the filename though.

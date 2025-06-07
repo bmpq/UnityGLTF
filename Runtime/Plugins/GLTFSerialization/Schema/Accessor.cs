@@ -223,7 +223,7 @@ namespace GLTF.Schema
 				writer.WriteStartArray();
 				foreach (var item in Max)
 				{
-					writer.WriteValue(item);
+					writer.WriteValue(SanitizeJsonNumber(item));
 				}
 				writer.WriteEndArray();
 			}
@@ -234,7 +234,7 @@ namespace GLTF.Schema
 				writer.WriteStartArray();
 				foreach (var item in Min)
 				{
-					writer.WriteValue(item);
+					writer.WriteValue(SanitizeJsonNumber(item));
 				}
 				writer.WriteEndArray();
 			}
@@ -255,8 +255,27 @@ namespace GLTF.Schema
 			writer.WriteEndObject();
 		}
 
-		private static unsafe sbyte GetByteElement(NativeArray<byte> buffer, uint byteOffset)
-		{
+        private static double SanitizeJsonNumber(double value)
+        {
+            if (double.IsNaN(value))
+            {
+                UnityEngine.Debug.LogWarning("NaN value!");
+                return 0;
+            }
+            if (double.IsPositiveInfinity(value))
+            {
+                return double.MaxValue;
+            }
+            if (double.IsNegativeInfinity(value))
+            {
+                return double.MinValue;
+            }
+
+            return value;
+        }
+
+        private static unsafe sbyte GetByteElement(NativeArray<byte> buffer, uint byteOffset)
+        {
 			return *((sbyte*)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr<byte>(buffer) + (int)byteOffset);
 		}
 

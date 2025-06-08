@@ -33,7 +33,7 @@ public static class Texture2DToWebPConverter
                     return null;
                 }
 
-                Debug.Log($"Successfully converted to WebP");
+                Debug.Log($"Successfully converted '{texture.name}' to WebP");
                 return webpBytes;
             }
         }
@@ -67,6 +67,8 @@ public static class Texture2DToWebPConverter
         System.Runtime.InteropServices.Marshal.Copy(bytePixels, 0, bmpData.Scan0, bytePixels.Length);
 
         bmp.UnlockBits(bmpData);
+
+        bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
 
         return bmp;
     }

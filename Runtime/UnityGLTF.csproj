@@ -5,6 +5,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <LangVersion>9.0</LangVersion>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <DefineConstants>
       $(DefineConstants);
       UNITY_2017_1_OR_NEWER;
@@ -28,6 +29,7 @@
       UNITY_2021_3_OR_NEWER;
       UNITY_ANIMATION;
     </DefineConstants>
+    <Configurations>UNITY_EDITOR;RUNTIME</Configurations>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Scripts\Interactivity\**" />
@@ -44,7 +46,7 @@
     <Reference Include="T:\GDT\EmptyProject_2021.3.17\Build\EmptyProject_2021.3.17_Data\Managed\Unity.Mathematics.dll" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Dynamicweb.WebP" Version="2.0.0" />
+    <PackageReference Include="Dynamicweb.WebP" Version="2.0.0" Condition="'$(Configuration)|$(Platform)'=='UNITY_EDITOR|AnyCPU'"/>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>

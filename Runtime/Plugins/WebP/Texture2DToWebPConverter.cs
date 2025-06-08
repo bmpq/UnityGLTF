@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -70,3 +71,4 @@ public static class Texture2DToWebPConverter
         return bmp;
     }
 }
+#endif

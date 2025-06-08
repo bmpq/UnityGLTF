@@ -152,7 +152,9 @@ namespace UnityGLTF
 		private bool tryExportTexturesFromDisk = false;
 		[SerializeField] [Tooltip("Determines texture export type (PNG or JPEG) based on alpha channel. When false, always exports lossless PNG files.")]
 		private bool useTextureFileTypeHeuristic = true;
+#if UNITY_EDITOR
         [SerializeField] [Tooltip("WebP is like JPEG but with better compression and an alpha channel.")]
+#endif
         private bool useWebp = false;
         [SerializeField] [Tooltip("Quality setting for exported JPEG files.")]
 		private int defaultJpegQuality = 90;
@@ -199,8 +201,18 @@ namespace UnityGLTF
 		public bool UseTextureFileTypeHeuristic { get => useTextureFileTypeHeuristic; set => useTextureFileTypeHeuristic = value; }
 		public bool OverrideTexturesName { get => overrideTexturesName; set => overrideTexturesName = value; }
 		public bool ExportVertexColors { get => exportVertexColors; set => exportVertexColors = value; }
-		public bool UseWebp { get => useWebp; set => useWebp = value; }
-		public int DefaultJpegQuality { get => defaultJpegQuality; set => defaultJpegQuality = value; }
+
+		public bool UseWebp
+		{
+#if UNITY_EDITOR
+			get => useWebp;
+            set => useWebp = value;
+#else
+			get => false;
+#endif
+        }
+
+        public int DefaultJpegQuality { get => defaultJpegQuality; set => defaultJpegQuality = value; }
 		public bool ExportDisabledGameObjects { get => exportDisabledGameObjects; set => exportDisabledGameObjects = value; }
 		public bool ExportAnimations { get => exportAnimations; set => exportAnimations = value; }
 		public bool BakeAnimationSpeed { get => bakeAnimationSpeed; set => bakeAnimationSpeed = value; }
@@ -243,9 +255,9 @@ namespace UnityGLTF
 	    
 	    public static GLTFSettings GetOrCreateSettings()
 	    {
-		    #if UNITY_EDITOR
+#if UNITY_EDITOR
 		    var hadSettings = true;
-		    #endif
+#endif
 		    if (!TryGetSettings(out var settings))
 		    {
 #if UNITY_EDITOR
@@ -274,7 +286,7 @@ namespace UnityGLTF
 		    
 		    RegisterPlugins(settings);
 		    
-#if UNITY_EDITOR		    
+#if UNITY_EDITOR
 		    // save again with plugins attached, if needed - the asset was only created in memory
 		    if (!hadSettings && !AssetDatabase.Contains(settings))
 				UnityEditorInternal.InternalEditorUtility.SaveToSerializedFileAndForget(new UnityEngine.Object[] { settings }, k_RuntimeAndEditorSettingsPath, true);

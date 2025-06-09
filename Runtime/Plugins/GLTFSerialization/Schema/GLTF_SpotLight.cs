@@ -8,6 +8,7 @@ namespace GLTF.Schema
 	{
 		public float innerConeAngle = 0;
 		public float outerConeAngle = (float)(System.Math.PI / 4.0);
+        public string cookieTexName;
 
 		public GLTFSpotLight()
 		{
@@ -19,7 +20,9 @@ namespace GLTF.Schema
 
 			innerConeAngle = node.innerConeAngle;
 			outerConeAngle = node.outerConeAngle;
-		}
+
+            cookieTexName = node.cookieTexName;
+        }
 
 		public new static GLTFSpotLight Deserialize(GLTFRoot root, JsonReader reader)
 		{

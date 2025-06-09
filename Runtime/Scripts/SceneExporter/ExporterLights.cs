@@ -19,8 +19,15 @@ namespace UnityGLTF
             if (unityLight.type == LightType.Spot)
             {
 	            // TODO URP/HDRP can distinguish here, no need to guess innerConeAngle there
-                light = new GLTFSpotLight() { innerConeAngle = unityLight.spotAngle / 2 * Mathf.Deg2Rad * 0.8f, outerConeAngle = unityLight.spotAngle / 2 * Mathf.Deg2Rad };
+                // TODO URP/HDRP can distinguish here, no need to guess innerConeAngle there
+                var spotLight = new GLTFSpotLight() { innerConeAngle = unityLight.spotAngle / 2 * Mathf.Deg2Rad * 0.8f, outerConeAngle = unityLight.spotAngle / 2 * Mathf.Deg2Rad };
+                light = spotLight;
                 light.Name = unityLight.name;
+
+                if (unityLight.cookie)
+                {
+                    spotLight.cookieTexName = unityLight.cookie.name;
+                }
 
                 light.type = unityLight.type.ToString().ToLower();
                 light.color = unityLight.color.ToNumericsColorLinear();

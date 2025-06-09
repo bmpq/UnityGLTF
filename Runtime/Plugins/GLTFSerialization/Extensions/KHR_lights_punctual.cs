@@ -279,7 +279,14 @@ namespace GLTF.Schema.KHR_lights_punctual
 					lightInfo.Add("spot", new JObject(
 						new JProperty(nameof(spotLight.innerConeAngle), spotLight.innerConeAngle),
 						new JProperty(nameof(spotLight.outerConeAngle), spotLight.outerConeAngle)));
-				}
+
+                    if (!string.IsNullOrEmpty(spotLight.cookieTexName))
+                    {
+                        var extras = new JObject();
+                        extras.Add("cookieTexName", spotLight.cookieTexName);
+                        lightInfo.Add("extras", extras);
+                    }
+                }
 			}
 			return new JProperty(EXTENSION_NAME, obj);
 		}

@@ -36,6 +36,9 @@ namespace UnityGLTF
                     (unityLight.intensity * Mathf.PI) :
                     // heuristically derived. Not sure why this matches expected light values / what Unity does when lightsUseLinearIntensity is false
                     (unityLight.intensity * Mathf.PI) * (unityLight.intensity * Mathf.PI) / 4 * Mathf.Sqrt(2);
+
+                if (unityLight.shadows == LightShadows.None)
+                    light.disableShadow = true;
             }
             else if (unityLight.type == LightType.Directional)
             {
@@ -60,6 +63,9 @@ namespace UnityGLTF
                 light.intensity = unityLight.intensity * Mathf.PI;
                 if (!GraphicsSettings.lightsUseLinearIntensity)
                     light.intensity *= unityLight.intensity;
+
+                if (unityLight.shadows == LightShadows.None)
+                    light.disableShadow = true;
             }
             else
             {

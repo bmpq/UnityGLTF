@@ -280,10 +280,16 @@ namespace GLTF.Schema.KHR_lights_punctual
 						new JProperty(nameof(spotLight.innerConeAngle), spotLight.innerConeAngle),
 						new JProperty(nameof(spotLight.outerConeAngle), spotLight.outerConeAngle)));
 
-                    if (!string.IsNullOrEmpty(spotLight.cookieTexName))
+                    if (!string.IsNullOrEmpty(spotLight.cookieTexName) || spotLight.disableShadow)
                     {
                         var extras = new JObject();
-                        extras.Add("cookieTexName", spotLight.cookieTexName);
+
+						if (!string.IsNullOrEmpty(spotLight.cookieTexName))
+							extras.Add("cookieTexName", spotLight.cookieTexName);
+
+						if (spotLight.disableShadow)
+							extras.Add("disableShadow", true);
+
                         lightInfo.Add("extras", extras);
                     }
                 }

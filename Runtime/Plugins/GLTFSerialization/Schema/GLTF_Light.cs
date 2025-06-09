@@ -12,6 +12,8 @@ namespace GLTF.Schema
 		public float intensity;
 		public float range;
 
+		public bool disableShadow;
+
 		public GLTFLight()
 		{
 		}
@@ -24,7 +26,9 @@ namespace GLTF.Schema
 			type = light.type;
 			name = "";
 			intensity = 1.0f;
-		}
+
+			disableShadow = false;
+        }
 
 		public static GLTFLight Deserialize(GLTFRoot root, JsonReader reader)
 		{

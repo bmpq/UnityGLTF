@@ -613,12 +613,44 @@ namespace UnityGLTF
 		{
 		}
 
-		/// <summary>
-		/// Create a GLTFExporter that exports out a transform
-		/// </summary>
-		/// <param name="rootTransforms">Root transform of object to export</param>
-		/// <param name="context">Export Settings</param>
-		public GLTFSceneExporter(Transform[] rootTransforms, ExportContext context)
+#if RUNTIME
+		private static Dictionary<string, Shader> bundleShaders = new Dictionary<string, Shader>();
+		public static void InjectBundleShaders(Shader[] shaders)
+		{
+            bundleShaders.Clear();
+            foreach (var shader in shaders)
+            {
+				bundleShaders.Add(shader.name, shader);
+            }
+        }
+        private static Shader GetShader(string shaderName)
+        {
+            if (bundleShaders.ContainsKey(shaderName))
+                return bundleShaders[shaderName];
+
+            if (bundleShaders.ContainsKey("Hidden/" + shaderName))
+                return bundleShaders["Hidden/" + shaderName];
+
+            if (bundleShaders.ContainsKey("Hidden/Blit/" + shaderName))
+                return bundleShaders["Hidden/Blit/" + shaderName];
+
+            UnityEngine.Debug.LogError(shaderName + ": Was not found in GLTFSceneExporter injected bundle! Did you forget to inject the bundle shaders with your mod??! dumbass");
+			// fallback
+			return Shader.Find(shaderName);
+        }
+#elif UNITY_EDITOR
+		private static Shader GetShader(string shaderName)
+        {
+            return Resources.Load(shaderName, typeof(Shader)) as Shader;
+        }
+#endif
+
+        /// <summary>
+        /// Create a GLTFExporter that exports out a transform
+        /// </summary>
+        /// <param name="rootTransforms">Root transform of object to export</param>
+        /// <param name="context">Export Settings</param>
+        public GLTFSceneExporter(Transform[] rootTransforms, ExportContext context)
 		{
 			_exportContext = context;
 			if (context.logger != null)
@@ -643,25 +675,14 @@ namespace UnityGLTF
 
 			_exportLayerMask = _exportContext.ExportLayers;
 
-			if (context.settings.ConvertTextures)
-			{
-				var metalGlossChannelSwapShader = Resources.Load("MetalGlossChannelSwap", typeof(Shader)) as Shader;
-				_metalGlossChannelSwapMaterial = new Material(metalGlossChannelSwapShader);
+			var metalGlossChannelSwapShader = GetShader("MetalGlossChannelSwap");
+			_metalGlossChannelSwapMaterial = new Material(metalGlossChannelSwapShader);
 
-				var metalGlossOcclusionChannelSwapShader = Resources.Load("MetalGlossOcclusionChannelSwap", typeof(Shader)) as Shader;
-				_metalGlossOcclusionChannelSwapMaterial = new Material(metalGlossOcclusionChannelSwapShader);
+			var metalGlossOcclusionChannelSwapShader = GetShader("MetalGlossOcclusionChannelSwap");
+			_metalGlossOcclusionChannelSwapMaterial = new Material(metalGlossOcclusionChannelSwapShader);
 
-				var normalChannelShader = Resources.Load("NormalChannel", typeof(Shader)) as Shader;
-				_normalChannelMaterial = new Material(normalChannelShader);
-			}
-			else
-			{
-                Shader shader = Shader.Find("Hidden/Internal-Colored");
-
-                _metalGlossChannelSwapMaterial = new Material(shader);
-                _metalGlossOcclusionChannelSwapMaterial = new Material(shader);
-                _normalChannelMaterial = new Material(shader);
-            }
+			var normalChannelShader = GetShader("NormalChannel");
+			_normalChannelMaterial = new Material(normalChannelShader);
 
 			// Remove invalid transforms
 			_rootTransforms = rootTransforms?.Where(x => x).ToArray() ?? Array.Empty<Transform>();

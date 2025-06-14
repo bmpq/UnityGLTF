@@ -36,49 +36,48 @@ namespace UnityGLTF
 				return;
 			}
 
-			bool allBoneTransformNodesHaveBeenExported = true;
-			for (int i = 0; i < skin.bones.Length; ++i)
-			{
-				if (!skin.bones[i])
-				{
-					Debug.LogWarning("Skin has null bone at index " + i + ": " + skin, skin);
-					continue;
-				}
-				var nodeId = skin.bones[i].GetInstanceID();
-				if (!_exportedTransforms.ContainsKey(nodeId))
-				{
-					allBoneTransformNodesHaveBeenExported = false;
-					break;
-				}
-			}
+            // Create new lists to hold only the valid, synchronized data.
+            var validJoints = new List<NodeId>(skin.bones.Length);
+            var validBindPoses = new List<Matrix4x4>(skin.bones.Length);
 
-			if (!allBoneTransformNodesHaveBeenExported)
-			{
-				Debug.LogWarning("Not all bones for SkinnedMeshRenderer " + transform + " were exported. Skin information will be skipped. Make sure the bones are active and enabled if you want to export them.", transform);
-				exportSkinFromNodeMarker.End();
-				return;
-			}
+            // Can't process more bones than we have bind poses for, and vice-versa.
+            int boneCount = Mathf.Min(skin.bones.Length, mesh.bindposes.Length);
 
-			for (int i = 0; i < skin.bones.Length; ++i)
-			{
-				if (!skin.bones[i])
-				{
-					continue;
-				}
+            // Add a warning if the arrays are mismatched, as this indicates a problem with the source asset.
+            if (skin.bones.Length != mesh.bindposes.Length)
+            {
+                Debug.LogWarning($"SkinnedMeshRenderer on '{skin.name}' has a mismatch between bone count ({skin.bones.Length}) and mesh bindpose count ({mesh.bindposes.Length}). The smaller of the two will be used, which may affect skinning.", skin);
+            }
 
-				var nodeId = skin.bones[i].GetInstanceID();
+            for (int i = 0; i < boneCount; ++i)
+            {
+                if (!skin.bones[i])
+                    continue;
 
-				gltfSkin.Joints.Add(
-					new NodeId
-					{
-						Id = _exportedTransforms[nodeId],
-						Root = _root
-					});
-			}
+                var nodeId = skin.bones[i].GetInstanceID();
+                if (!_exportedTransforms.ContainsKey(nodeId))
+                    continue;
 
-			gltfSkin.InverseBindMatrices = ExportAccessor(mesh.bindposes);
+                // If all checks pass for this index, add the joint AND its corresponding bind pose.
+                // This guarantees the two lists stay in sync.
+                validJoints.Add(new NodeId { Id = _exportedTransforms[nodeId], Root = _root });
+                validBindPoses.Add(mesh.bindposes[i]);
+            }
 
-			Vector4[] bones = boneWeightToBoneVec4(mesh.boneWeights);
+            // If after all filtering we have no valid joints, we can't create a skin.
+            if (validJoints.Count == 0)
+            {
+                Debug.LogWarning("No valid joints found for skin on " + transform, transform);
+                exportSkinFromNodeMarker.End();
+                return;
+            }
+
+            // Assign the synchronized lists to the glTF skin object.
+            gltfSkin.Joints = validJoints;
+            gltfSkin.InverseBindMatrices = ExportAccessor(validBindPoses.ToArray());
+
+
+            Vector4[] bones = boneWeightToBoneVec4(mesh.boneWeights);
 			Vector4[] weights = boneWeightToWeightVec4(mesh.boneWeights);
 
 			AccessorId sharedBones = null;

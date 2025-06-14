@@ -158,6 +158,12 @@ namespace UnityGLTF
 
 		private void WriteRenderTextureToDiskAndRelease(RenderTexture destRenderTexture, string outputPath, bool linear)
 		{
+			if (File.Exists(outputPath) && !settings.OverrideTexturesName)
+			{
+                RenderTexture.ReleaseTemporary(destRenderTexture);
+				return;
+            }
+
 			RenderTexture.active = destRenderTexture;
 
 			TextureFormat format = TextureFormat.ARGB32;
@@ -330,9 +336,6 @@ namespace UnityGLTF
 				imagePath = Path.ChangeExtension(imagePath, desiredExtension);
 			}
 			
-			// Avoid overwriting existing files (optional)
-			if (!settings.OverrideTexturesName)
-				imagePath = GetUniqueName(_imageExportPaths, imagePath);
 			_imageExportPaths.Add(imagePath);
 
 			return imagePath;

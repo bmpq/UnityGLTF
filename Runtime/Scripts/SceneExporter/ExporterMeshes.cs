@@ -348,10 +348,19 @@ namespace UnityGLTF
 					var primitive = new MeshPrimitive();
 
 					var topology = meshObj.GetTopology(submesh);
-					var indices = meshObj.GetIndices(submesh);
+
+                    var drawMode = GetDrawMode(topology, meshObj);
+                    if (!drawMode.HasValue)
+                    {
+                        // The topology is unsupported. GetDrawMode has already logged a warning.
+                        // Skip processing this submesh entirely.
+                        continue;
+                    }
+                    primitive.Mode = drawMode.Value;
+
+                    var indices = meshObj.GetIndices(submesh);
 					if (topology == MeshTopology.Triangles) SchemaExtensions.FlipTriangleFaces(indices);
 
-					primitive.Mode = GetDrawMode(topology);
 					primitive.Indices = ExportAccessor(indices, true);
 					primitive.Indices.Value.BufferView.Value.Target = BufferViewTarget.ElementArrayBuffer;
 
@@ -392,7 +401,7 @@ namespace UnityGLTF
             {
 	            var prim = prims[i];
 	            // remove any prims that have empty triangles
-	            if (EmptyPrimitive(prim)) continue;
+	            if (prim == null || EmptyPrimitive(prim)) continue;
 	            // invoke pre export event
 	            foreach (var plugin in _plugins)
 		            plugin?.AfterPrimitiveExport(this, meshObj, prim, i);
@@ -565,18 +574,21 @@ namespace UnityGLTF
 			return false;
 		}
 
-		private static DrawMode GetDrawMode(MeshTopology topology)
-		{
-			switch (topology)
-			{
-				case MeshTopology.Points: return DrawMode.Points;
-				case MeshTopology.Lines: return DrawMode.Lines;
-				case MeshTopology.LineStrip: return DrawMode.LineStrip;
-				case MeshTopology.Triangles: return DrawMode.Triangles;
-			}
+        private static DrawMode? GetDrawMode(MeshTopology topology, UnityEngine.Object context = null)
+        {
+            switch (topology)
+            {
+                case MeshTopology.Points: return DrawMode.Points;
+                case MeshTopology.Lines: return DrawMode.Lines;
+                case MeshTopology.LineStrip: return DrawMode.LineStrip;
+                case MeshTopology.Triangles: return DrawMode.Triangles;
 
-			throw new Exception("glTF does not support Unity mesh topology: " + topology);
-		}
+                // Handle unsupported topologies
+                default:
+                    Debug.LogWarning("glTF does not support Unity mesh topology: " + topology + ". This submesh will be skipped.", context);
+                    return null;
+            }
+        }
 
 #if UNITY_EDITOR
 		private const string MakeMeshReadableDialogueDecisionKey = nameof(MakeMeshReadableDialogueDecisionKey);

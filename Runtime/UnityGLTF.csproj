@@ -28,6 +28,7 @@
       UNITY_2021_2_OR_NEWER;
       UNITY_2021_3_OR_NEWER;
       UNITY_ANIMATION;
+      UNITY_WEBREQUEST;
     </DefineConstants>
     <Configurations>UNITY_EDITOR;RUNTIME</Configurations>
   </PropertyGroup>

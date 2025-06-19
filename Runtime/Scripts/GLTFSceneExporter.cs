@@ -613,38 +613,6 @@ namespace UnityGLTF
 		{
 		}
 
-#if RUNTIME
-		private static Dictionary<string, Shader> bundleShaders = new Dictionary<string, Shader>();
-		public static void InjectBundleShaders(Shader[] shaders)
-		{
-            bundleShaders.Clear();
-            foreach (var shader in shaders)
-            {
-				bundleShaders.Add(shader.name, shader);
-            }
-        }
-        private static Shader GetShader(string shaderName)
-        {
-            if (bundleShaders.ContainsKey(shaderName))
-                return bundleShaders[shaderName];
-
-            if (bundleShaders.ContainsKey("Hidden/" + shaderName))
-                return bundleShaders["Hidden/" + shaderName];
-
-            if (bundleShaders.ContainsKey("Hidden/Blit/" + shaderName))
-                return bundleShaders["Hidden/Blit/" + shaderName];
-
-            UnityEngine.Debug.LogError(shaderName + ": Was not found in GLTFSceneExporter injected bundle! Did you forget to inject the bundle shaders with your mod??! dumbass");
-			// fallback
-			return Shader.Find(shaderName);
-        }
-#elif UNITY_EDITOR
-		private static Shader GetShader(string shaderName)
-        {
-            return Resources.Load(shaderName, typeof(Shader)) as Shader;
-        }
-#endif
-
         /// <summary>
         /// Create a GLTFExporter that exports out a transform
         /// </summary>
@@ -675,13 +643,13 @@ namespace UnityGLTF
 
 			_exportLayerMask = _exportContext.ExportLayers;
 
-			var metalGlossChannelSwapShader = GetShader("MetalGlossChannelSwap");
+			var metalGlossChannelSwapShader = BundleResources.GetShader("MetalGlossChannelSwap");
 			_metalGlossChannelSwapMaterial = new Material(metalGlossChannelSwapShader);
 
-			var metalGlossOcclusionChannelSwapShader = GetShader("MetalGlossOcclusionChannelSwap");
+			var metalGlossOcclusionChannelSwapShader = BundleResources.GetShader("MetalGlossOcclusionChannelSwap");
 			_metalGlossOcclusionChannelSwapMaterial = new Material(metalGlossOcclusionChannelSwapShader);
 
-			var normalChannelShader = GetShader("NormalChannel");
+			var normalChannelShader = BundleResources.GetShader("NormalChannel");
 			_normalChannelMaterial = new Material(normalChannelShader);
 
 			// Remove invalid transforms

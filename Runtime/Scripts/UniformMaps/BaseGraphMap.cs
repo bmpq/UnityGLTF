@@ -15,7 +15,7 @@ namespace UnityGLTF
 
 		protected BaseGraphMap(string shaderName, string fallbackGuid)
 		{
-			var s = Shader.Find(shaderName);
+			var s = BundleResources.GetShader(shaderName);
 
 #if UNITY_EDITOR
 			// workaround for first-import issues with Shader.Find and import order

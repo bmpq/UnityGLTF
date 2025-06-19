@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using UnityEngine;
+﻿using UnityEngine;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -33,7 +32,6 @@ public static class Texture2DToWebPConverter
                     return null;
                 }
 
-                Debug.Log($"Successfully converted '{texture.name}' to WebP");
                 return webpBytes;
             }
         }
@@ -73,4 +71,3 @@ public static class Texture2DToWebPConverter
         return bmp;
     }
 }
-#endif

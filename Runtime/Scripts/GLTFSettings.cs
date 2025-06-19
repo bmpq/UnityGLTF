@@ -149,9 +149,7 @@ namespace UnityGLTF
 		private bool tryExportTexturesFromDisk = false;
 		[SerializeField] [Tooltip("Determines texture export type (PNG or JPEG) based on alpha channel. When false, always exports lossless PNG files.")]
 		private bool useTextureFileTypeHeuristic = true;
-#if UNITY_EDITOR
         [SerializeField] [Tooltip("WebP is like JPEG but with better compression and an alpha channel.")]
-#endif
         private bool useWebp = false;
         [SerializeField] [Tooltip("Quality setting for exported JPEG files.")]
 		private int defaultJpegQuality = 90;
@@ -196,12 +194,8 @@ namespace UnityGLTF
 
 		public bool UseWebp
 		{
-#if UNITY_EDITOR
 			get => useWebp;
             set => useWebp = value;
-#else
-			get => false;
-#endif
         }
 
         public int DefaultJpegQuality { get => defaultJpegQuality; set => defaultJpegQuality = value; }

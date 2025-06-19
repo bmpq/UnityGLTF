@@ -180,10 +180,8 @@ namespace UnityGLTF
 				binaryData = exportTexture.EncodeToPNG();
 			else if (outputPath.EndsWith(".exr"))
 				binaryData = exportTexture.EncodeToEXR(Texture2D.EXRFlags.CompressZIP);
-#if UNITY_EDITOR
             else if (outputPath.EndsWith(".webp"))
 				binaryData = exportTexture.EncodeToWEBP(settings.DefaultJpegQuality);
-#endif
 			else
 			{
 				Debug.LogError("Unsupported file extension: " + outputPath, destRenderTexture);

@@ -276,12 +276,8 @@ namespace UnityGLTF
 				
 				if (meshObj.HasVertexAttribute(VertexAttribute.TexCoord1))
 				{
-					var uvDim1 = meshObj.GetVertexAttributeDimension(VertexAttribute.TexCoord1);
-					if (uvDim1 != 2)
-						Debug.LogWarning(null, "UV1 must be Vector2 in glTF, but it has " + uvDim1 + " channels. Only xy will be exported. Mesh: " + meshObj.name);
-					var uv2 = meshObj.uv2;
-					if (uv2.Length != 0)
-						aTexcoord1 = ExportAccessor(SchemaExtensions.FlipTexCoordArrayVAndCopy(uv2));
+					// trips up with vec4, producing an invalid gltf.
+					// skipping fixes that, dont care about missing data
 				}
 
 				// From UV2, we're exporting as custom attribute

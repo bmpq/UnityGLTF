@@ -19,18 +19,11 @@
       UNITY_2019_1_OR_NEWER;
       UNITY_2019_2_OR_NEWER;
       UNITY_2019_3_OR_NEWER;
-      UNITY_2019_4_OR_NEWER;
-      UNITY_2020_1_OR_NEWER;
-      UNITY_2020_2_OR_NEWER;
-      UNITY_2020_3_OR_NEWER;
-      UNITY_2020_4_OR_NEWER;
-      UNITY_2021_1_OR_NEWER;
-      UNITY_2021_2_OR_NEWER;
-      UNITY_2021_3_OR_NEWER;
       UNITY_ANIMATION;
       UNITY_WEBREQUEST;
     </DefineConstants>
     <Configurations>UNITY_EDITOR;RUNTIME</Configurations>
+    <RuntimeManagedAssembliesPath>T:\GDT\EmptyProject_2019.3.15\Build\EmptyProject_2019.3.15_Data\Managed\</RuntimeManagedAssembliesPath>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Scripts\Interactivity\**" />
@@ -41,15 +34,12 @@
     <None Remove="Scripts\Plugins\Experimental\**" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="T:\Unity\2021.3.17f1\Editor\Data\Managed\UnityEngine\*.dll" />
-    <Reference Include="T:\GDT\EmptyProject_2021.3.17\Build\EmptyProject_2021.3.17_Data\Managed\UnityEngine.UI.dll" />
-    <Reference Include="T:\GDT\EmptyProject_2021.3.17\Build\EmptyProject_2021.3.17_Data\Managed\UnityEngine.ImageConversionModule.dll" />
-    <Reference Include="T:\GDT\EmptyProject_2021.3.17\Build\EmptyProject_2021.3.17_Data\Managed\Unity.Mathematics.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Dynamicweb.WebP" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
-  </ItemGroup>
-  
+    <Reference Include="T:\Unity\2019.3.15f1\Editor\Data\Managed\UnityEngine\*.dll" />
+    <Reference Include="$(RuntimeManagedAssembliesPath)UnityEngine.UI.dll" />
+    <Reference Include="$(RuntimeManagedAssembliesPath)UnityEngine.ImageConversionModule.dll" />
+    <Reference Include="$(RuntimeManagedAssembliesPath)Unity.Mathematics.dll" />
+  </ItemGroup>  
 </Project>

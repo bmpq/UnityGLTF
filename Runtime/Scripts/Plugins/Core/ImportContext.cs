@@ -4,6 +4,7 @@ using UnityEditor;
 
 #if UNITY_EDITOR
 using UnityEditor.AssetImporters;
+using UnityEditor.Experimental.AssetImporters;
 #endif
 
 namespace UnityGLTF.Plugins

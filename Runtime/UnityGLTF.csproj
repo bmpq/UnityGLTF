@@ -21,8 +21,8 @@
       UNITY_2019_3_OR_NEWER;
       UNITY_ANIMATION;
       UNITY_WEBREQUEST;
+      DYNAMICWEB_WEBP;
     </DefineConstants>
-    <Configurations>UNITY_EDITOR;RUNTIME</Configurations>
     <RuntimeManagedAssembliesPath>T:\GDT\EmptyProject_2019.3.15\Build\EmptyProject_2019.3.15_Data\Managed\</RuntimeManagedAssembliesPath>
   </PropertyGroup>
   <ItemGroup>

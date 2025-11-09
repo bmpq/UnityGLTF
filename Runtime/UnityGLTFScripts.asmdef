@@ -11,7 +11,8 @@
         "Draco",
         "Unity.Meshopt.Decompress",
         "Unity.Collections",
-        "Unity.Mathematics"
+        "Unity.Mathematics",
+        "unity.webp"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -23,6 +24,11 @@
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [
+        {
+            "name": "com.netpyoung.webp",
+            "expression": "0.3.0",
+            "define": "HAVE_WEBP"
+        },
         {
             "name": "com.atteneder.ktx",
             "expression": "1.3.0",

@@ -2,6 +2,8 @@
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
+
+#if DYNAMICWEB_WEBP
 using Dynamicweb.WebP;
 public static class Texture2DToWebPConverter
 {
@@ -71,3 +73,4 @@ public static class Texture2DToWebPConverter
         return bmp;
     }
 }
+#endif

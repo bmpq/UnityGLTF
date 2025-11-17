@@ -189,7 +189,7 @@ namespace UnityGLTF
 	#if DYNAMICWEB_WEBP
 				binaryData = exportTexture.EncodeToWEBP(settings.DefaultJpegQuality);
 	#elif HAVE_WEBP
-				binaryData = exportTexture.EncodeToWebP(settings.DefaultJpegQuality, out var _);
+				binaryData = exportTexture.EncodeToWEBPFlippedY(settings.DefaultJpegQuality, out var _);
 	#endif
 #endif
 			else

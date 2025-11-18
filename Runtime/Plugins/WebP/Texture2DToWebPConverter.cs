@@ -4,11 +4,11 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System;
-using unity.libwebp;
 
 #if DYNAMICWEB_WEBP
 using Dynamicweb.WebP;
 #elif HAVE_WEBP
+using unity.libwebp;
 using WebP;
 #endif
 

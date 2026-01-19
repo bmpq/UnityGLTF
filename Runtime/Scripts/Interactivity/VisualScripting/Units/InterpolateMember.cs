@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+#if HAVE_VISUAL_SCRIPTING
 //namespace UnityGLTF.Interactivity.Units
 namespace Unity.VisualScripting
 {
@@ -266,3 +267,5 @@ namespace Unity.VisualScripting
     }
     
 }
+
+#endif

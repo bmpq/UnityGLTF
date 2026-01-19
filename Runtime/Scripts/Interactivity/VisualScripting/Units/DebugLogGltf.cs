@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if HAVE_VISUAL_SCRIPTING
 namespace Unity.VisualScripting
 {
     [UnitCategory("Debug")]
@@ -106,3 +107,5 @@ namespace Unity.VisualScripting
         }
     }
 }
+
+#endif

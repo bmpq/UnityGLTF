@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+#if HAVE_VISUAL_SCRIPTING
 namespace Unity.VisualScripting
 {
     [UnitCategory("Variables")]
@@ -262,3 +263,4 @@ namespace Unity.VisualScripting
         }
     }
 }
+#endif

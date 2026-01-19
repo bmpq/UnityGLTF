@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+#if HAVE_VISUAL_SCRIPTING
 namespace Unity.VisualScripting
 {
     public abstract class AbstractMaterialInterpolate<TValueType> : Unit, IGraphElementWithData, IGraphEventListener
@@ -214,3 +215,5 @@ namespace Unity.VisualScripting
         }
     }
 }
+
+#endif

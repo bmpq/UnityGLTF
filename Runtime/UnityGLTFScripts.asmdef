@@ -27,7 +27,7 @@
         {
             "name": "com.netpyoung.webp",
             "expression": "0.3.0",
-            "define": "HAVE_WEBP"
+            "define": "NETPYOUNG_UNITY_WEBP"
         },
         {
             "name": "com.atteneder.ktx",

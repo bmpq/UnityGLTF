@@ -7,7 +7,7 @@ using UnityGLTF.Cache;
 using Object = UnityEngine.Object;
 using WrapMode = GLTF.Schema.WrapMode;
 
-#if HAVE_WEBP
+#if NETPYOUNG_UNITY_WEBP
 using WebP;
 #endif
 
@@ -184,15 +184,11 @@ namespace UnityGLTF
 				binaryData = exportTexture.EncodeToPNG();
 			else if (outputPath.EndsWith(".exr"))
 				binaryData = exportTexture.EncodeToEXR(Texture2D.EXRFlags.CompressZIP);
-#if DYNAMICWEB_WEBP || HAVE_WEBP
+#if NETPYOUNG_UNITY_WEBP
 			else if (outputPath.EndsWith(".webp"))
-	#if DYNAMICWEB_WEBP
-				binaryData = exportTexture.EncodeToWEBP(settings.DefaultJpegQuality);
-	#elif HAVE_WEBP
-				binaryData = exportTexture.EncodeToWEBPFlippedY(settings.DefaultJpegQuality, out var _);
-	#endif
+                binaryData = exportTexture.EncodeToWEBPFlippedY(settings.DefaultJpegQuality, out var _);
 #endif
-			else
+            else
 			{
 				Debug.LogError("Unsupported file extension: " + outputPath, destRenderTexture);
 				binaryData = exportTexture.EncodeToPNG();

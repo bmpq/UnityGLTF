@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if HAVE_VISUAL_SCRIPTING
 namespace Unity.VisualScripting
 {
     [UnitCategory("Material")]
@@ -36,3 +37,5 @@ namespace Unity.VisualScripting
         
     }
 }
+
+#endif

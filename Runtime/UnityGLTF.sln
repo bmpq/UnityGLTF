@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35122.118
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnityGLTF", "UnityGLTF.csproj", "{41C24465-3FFD-4C49-8A16-7ECA419FF0A1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		RUNTIME|Any CPU = RUNTIME|Any CPU
+		UNITY_EDITOR|Any CPU = UNITY_EDITOR|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{41C24465-3FFD-4C49-8A16-7ECA419FF0A1}.RUNTIME|Any CPU.ActiveCfg = RUNTIME|Any CPU
+		{41C24465-3FFD-4C49-8A16-7ECA419FF0A1}.RUNTIME|Any CPU.Build.0 = RUNTIME|Any CPU
+		{41C24465-3FFD-4C49-8A16-7ECA419FF0A1}.UNITY_EDITOR|Any CPU.ActiveCfg = UNITY_EDITOR|Any CPU
+		{41C24465-3FFD-4C49-8A16-7ECA419FF0A1}.UNITY_EDITOR|Any CPU.Build.0 = UNITY_EDITOR|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7C681615-2DE6-4CF2-B388-F19F9C744160}
+	EndGlobalSection
+EndGlobal
